@@ -25,6 +25,17 @@ import org.junit.Test;
 public class RouteStatisticsTest {
 
     @Test
+    public void canSetRouteName() {
+        ProcessorHolder holder = new ProcessorHolder();
+
+        RouteStatistics stat = new RouteStatistics();
+        stat.setProcessorHolder(holder);
+
+        Assert.assertNotNull(stat.getProcessorHolder());
+        Assert.assertEquals(holder, stat.getProcessorHolder());
+    }
+
+    @Test
     public void canSetInflightExchange() {
         RouteStatistics stat = new RouteStatistics();
         stat.setInflightExchange(1);
@@ -40,15 +51,6 @@ public class RouteStatisticsTest {
 
         Assert.assertNotNull(stat.getMeanProcessingTime());
         Assert.assertEquals(new Long(2L), stat.getMeanProcessingTime());
-    }
-
-    @Test
-    public void canSetRouteName() {
-        RouteStatistics stat = new RouteStatistics();
-        stat.setRouteName("route1");
-
-        Assert.assertNotNull(stat.getRouteName());
-        Assert.assertEquals("route1", stat.getRouteName());
     }
 
     @Test

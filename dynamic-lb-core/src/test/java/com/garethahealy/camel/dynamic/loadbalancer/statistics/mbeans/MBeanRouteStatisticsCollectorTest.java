@@ -21,6 +21,7 @@ package com.garethahealy.camel.dynamic.loadbalancer.statistics.mbeans;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import javax.management.ReflectionException;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 
+import org.apache.camel.Processor;
 import org.apache.camel.management.DefaultManagementAgent;
 import org.apache.camel.management.DefaultManagementStrategy;
 import org.apache.camel.test.junit4.ExchangeTestSupport;
@@ -76,8 +78,12 @@ public class MBeanRouteStatisticsCollectorTest extends ExchangeTestSupport {
         Mockito.when(mBeanServerMocked.getAttribute(Mockito.any(ObjectName.class), Mockito.eq("Load05"))).thenReturn("5");
         Mockito.when(mBeanServerMocked.getAttribute(Mockito.any(ObjectName.class), Mockito.eq("Load15"))).thenReturn("15");
 
-        MBeanRouteStatisticsCollector collector = new MBeanRouteStatisticsCollector(context, mBeanServerMocked);
-        List<RouteStatistics> stats = collector.query(routeNamesAndProcessors.keySet());
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(Mockito.mock(Processor.class));
+        processors.add(Mockito.mock(Processor.class));
+
+        MBeanRouteStatisticsCollector collector = new MBeanRouteStatisticsCollector(context, mBeanServerMocked, "route");
+        List<RouteStatistics> stats = collector.query(processors, createExchange());
 
         Assert.assertNotNull(stats);
         Assert.assertEquals(1, stats.size());

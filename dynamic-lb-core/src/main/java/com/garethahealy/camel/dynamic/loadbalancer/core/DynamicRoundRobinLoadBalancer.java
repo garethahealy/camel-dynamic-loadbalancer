@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DynamicRoundRobinLoadBalancer.class);
     private DynamicLoadBalancerConfiguration config;
 
     public DynamicRoundRobinLoadBalancer(DynamicLoadBalancerConfiguration config) {
@@ -43,22 +42,17 @@ public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
     }
 
     @Override
-    protected Processor chooseProcessor(List<Processor> processors, Exchange exchange) {
+    protected synchronized Processor chooseProcessor(List<Processor> processors, Exchange exchange) {
         Processor answer = null;
         Processor defaultSelection = super.chooseProcessor(processors, exchange);
 
         DeterministicCollectorStrategy deterministicCollectorStrategy = config.getDeterministicCollectorStrategy();
         if (deterministicCollectorStrategy.shouldCollect()) {
             RouteStatisticsCollector routeStatisticsCollector = config.getRouteStatisticsCollector();
-            List<RouteStatistics> stats = routeStatisticsCollector.query(config.getRouteNames());
+            List<RouteStatistics> stats = routeStatisticsCollector.query(processors, exchange);
             if (stats.size() >= 0) {
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
-                int found = selectorStrategy.getBestProcessorIndex(stats);
-                if (found >= 0 && found < processors.size()) {
-                    LOG.debug("Found processor at index '{}' with processors containing '{}'", found, processors.size());
-
-                    answer = processors.get(found);
-                }
+                answer = selectorStrategy.getProcessor(stats);
             }
         }
 

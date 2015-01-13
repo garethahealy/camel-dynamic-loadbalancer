@@ -23,7 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class RouteStatistics {
 
-    private String routeName;
+    private ProcessorHolder processorHolder;
     private Integer inflightExchange;
     private Long meanProcessingTime;
     private Long lastProcessingTime;
@@ -31,12 +31,12 @@ public class RouteStatistics {
     private String load05;
     private String load15;
 
-    public String getRouteName() {
-        return routeName;
+    public ProcessorHolder getProcessorHolder() {
+        return processorHolder;
     }
 
-    public void setRouteName(String routeName) {
-        this.routeName = routeName;
+    public void setProcessorHolder(ProcessorHolder processorHolder) {
+        this.processorHolder = processorHolder;
     }
 
     public Integer getInflightExchange() {
@@ -90,7 +90,7 @@ public class RouteStatistics {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-            .append("routeName", routeName)
+            .append("processorHolder", processorHolder)
             .append("inflightExchange", inflightExchange)
             .append("meanProcessingTime", meanProcessingTime)
             .append("lastProcessingTime", lastProcessingTime)

@@ -19,12 +19,30 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.example1.routes;
 
+import java.util.Dictionary;
+import java.util.Map;
+
+import javax.management.MBeanServer;
+
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
+import org.apache.camel.util.KeyValueHolder;
+import org.mockito.Mockito;
 
 public class BaseCamelBlueprintTestSupport extends CamelBlueprintTestSupport {
 
     @Override
     protected String getBlueprintDescriptor() {
         return "OSGI-INF/blueprint/dynamic-lb-example1-context.xml";
+    }
+
+    @Override
+    protected void addServicesOnStartup(Map<String, KeyValueHolder<Object, Dictionary>> services) {
+        MBeanServer mBeanServer = Mockito.mock(MBeanServer.class);
+
+        services.put(MBeanServer.class.getCanonicalName(), asService(mBeanServer, null));
+    }
+
+    protected void provideMockMethods(MBeanServer mBeanServer) {
+
     }
 }

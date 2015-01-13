@@ -19,9 +19,6 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.core;
 
-import java.util.Map;
-import java.util.Set;
-
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.DeterministicCollectorStrategy;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.ProcessorSelectorStrategy;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.RouteStatisticsCollector;
@@ -33,7 +30,17 @@ public class DynamicLoadBalancerConfiguration {
     private ProcessorSelectorStrategy routeStatsSelectorStrategy;
     private DeterministicCollectorStrategy deterministicCollectorStrategy;
     private RouteStatisticsCollector routeStatisticsCollector;
-    private Set<String> routeNames;
+
+    public DynamicLoadBalancerConfiguration(ProcessorSelectorStrategy routeStatsSelectorStrategy, DeterministicCollectorStrategy deterministicCollectorStrategy,
+                                            RouteStatisticsCollector routeStatisticsCollector) {
+        this.routeStatsSelectorStrategy = routeStatsSelectorStrategy;
+        this.deterministicCollectorStrategy = deterministicCollectorStrategy;
+        this.routeStatisticsCollector = routeStatisticsCollector;
+    }
+
+    public DynamicLoadBalancerConfiguration() {
+
+    }
 
     public ProcessorSelectorStrategy getRouteStatsSelectorStrategy() {
         return routeStatsSelectorStrategy;
@@ -59,21 +66,12 @@ public class DynamicLoadBalancerConfiguration {
         this.routeStatisticsCollector = routeStatisticsCollector;
     }
 
-    public Set<String> getRouteNames() {
-        return routeNames;
-    }
-
-    public void setRouteNames(Set<String> routeNames) {
-        this.routeNames = routeNames;
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)
             .append("routeStatsSelectorStrategy", routeStatsSelectorStrategy)
             .append("deterministicCollectorStrategy", deterministicCollectorStrategy)
             .append("routeStatisticsCollector", routeStatisticsCollector)
-            .append("routeNames", routeNames)
             .toString();
     }
 }

@@ -21,55 +21,70 @@ package com.garethahealy.camel.dynamic.loadbalancer.statistics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.ProcessorSelectorStrategy;
+
+import org.apache.camel.Processor;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class MeanProcessingTimeProcessorSelectorStrategyTest {
 
     @Test
     public void getProcessorIndexCorrect() {
-        Map<String, Integer> routeNamesAndProcessors = new HashMap<String, Integer>();
-        routeNamesAndProcessors.put("route1", 0);
-        routeNamesAndProcessors.put("route2", 1);
+        ProcessorHolder processorHolder1 = new ProcessorHolder();
+        processorHolder1.setProcessor(Mockito.mock(Processor.class));
+
+        ProcessorHolder processorHolder2 = new ProcessorHolder();
+        processorHolder2.setProcessor(Mockito.mock(Processor.class));
 
         RouteStatistics stat1 = new RouteStatistics();
-        stat1.setRouteName("route1");
+        stat1.setProcessorHolder(processorHolder1);
         stat1.setMeanProcessingTime(12345L);
 
         RouteStatistics stat2 = new RouteStatistics();
-        stat2.setRouteName("route2");
+        stat2.setProcessorHolder(processorHolder2);
         stat2.setMeanProcessingTime(54321L);
 
         List<RouteStatistics> stats = new ArrayList<RouteStatistics>();
         stats.add(stat1);
         stats.add(stat2);
 
-        MeanProcessingTimeProcessorSelectorStrategy strategy = new MeanProcessingTimeProcessorSelectorStrategy(routeNamesAndProcessors);
-        int index = strategy.getBestProcessorIndex(stats);
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(processorHolder1.getProcessor());
+        processors.add(processorHolder2.getProcessor());
 
-        Assert.assertEquals(0, index);
+        ProcessorSelectorStrategy strategy = new MeanProcessingTimeProcessorSelectorStrategy();
+        Processor processor = strategy.getProcessor(stats);
+
+        Assert.assertNotNull(processor);
     }
 
     @Test
     public void getProcessorIndexCorrectWithMultpleStats() {
-        Map<String, Integer> routeNamesAndProcessors = new HashMap<String, Integer>();
-        routeNamesAndProcessors.put("route1", 0);
-        routeNamesAndProcessors.put("route2", 1);
-        routeNamesAndProcessors.put("route3", 2);
+        ProcessorHolder processorHolder1 = new ProcessorHolder();
+        processorHolder1.setProcessor(Mockito.mock(Processor.class));
+
+        ProcessorHolder processorHolder2 = new ProcessorHolder();
+        processorHolder2.setProcessor(Mockito.mock(Processor.class));
+
+        ProcessorHolder processorHolder3 = new ProcessorHolder();
+        processorHolder3.setProcessor(Mockito.mock(Processor.class));
 
         RouteStatistics stat1 = new RouteStatistics();
-        stat1.setRouteName("route1");
+        stat1.setProcessorHolder(processorHolder1);
         stat1.setMeanProcessingTime(12345L);
 
         RouteStatistics stat2 = new RouteStatistics();
-        stat2.setRouteName("route2");
+        stat2.setProcessorHolder(processorHolder2);
         stat2.setMeanProcessingTime(1L);
 
         RouteStatistics stat3 = new RouteStatistics();
-        stat3.setRouteName("route3");
+        stat3.setProcessorHolder(processorHolder3);
         stat3.setMeanProcessingTime(54321L);
 
         List<RouteStatistics> stats = new ArrayList<RouteStatistics>();
@@ -77,9 +92,14 @@ public class MeanProcessingTimeProcessorSelectorStrategyTest {
         stats.add(stat2);
         stats.add(stat3);
 
-        MeanProcessingTimeProcessorSelectorStrategy strategy = new MeanProcessingTimeProcessorSelectorStrategy(routeNamesAndProcessors);
-        int index = strategy.getBestProcessorIndex(stats);
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(processorHolder1.getProcessor());
+        processors.add(processorHolder2.getProcessor());
+        processors.add(processorHolder3.getProcessor());
 
-        Assert.assertEquals(1, index);
+        ProcessorSelectorStrategy strategy = new MeanProcessingTimeProcessorSelectorStrategy();
+        Processor processor = strategy.getProcessor(stats);
+
+        Assert.assertNotNull(processor);
     }
 }

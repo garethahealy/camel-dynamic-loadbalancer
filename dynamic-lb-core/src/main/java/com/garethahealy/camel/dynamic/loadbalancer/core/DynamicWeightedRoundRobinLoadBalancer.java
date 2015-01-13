@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoadBalancer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DynamicWeightedRoundRobinLoadBalancer.class);
     private DynamicLoadBalancerConfiguration config;
 
     public DynamicWeightedRoundRobinLoadBalancer(DynamicLoadBalancerConfiguration config) {
@@ -46,28 +45,36 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
     }
 
     @Override
-    protected Processor chooseProcessor(List<Processor> processors, Exchange exchange) {
+    protected synchronized Processor chooseProcessor(List<Processor> processors, Exchange exchange) {
         DeterministicCollectorStrategy deterministicCollectorStrategy = config.getDeterministicCollectorStrategy();
 
-        boolean isFirstRun = getRuntimeRatios().size() <= 0;
-        if (isFirstRun || deterministicCollectorStrategy.shouldCollect()) {
+        if (getRuntimeRatios().size() <= 0) {
+            loadRuntimeRatios(getDefaultRuntimeRatios(processors));
+        }
+
+        if (deterministicCollectorStrategy.shouldCollect()) {
             RouteStatisticsCollector routeStatisticsCollector = config.getRouteStatisticsCollector();
-            List<RouteStatistics> stats = routeStatisticsCollector.query(config.getRouteNames());
+            List<RouteStatistics> stats = routeStatisticsCollector.query(processors, exchange);
             if (stats.size() >= 0) {
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
-                List<Integer> found = selectorStrategy.getOrderedProcessorIndexs(stats);
-
-                LOG.debug("Found processors ordered as '{}' with processors containing '{}'", found.toArray(), processors.size());
+                List<Integer> found = selectorStrategy.getWeightedProcessors(stats);
 
                 getRuntimeRatios().clear();
                 loadRuntimeRatios(found);
             }
         }
 
-        //TODO?
-        //- is processors ordered, i.e.: linkedlist
-
         return super.chooseProcessor(processors, exchange);
+    }
+
+    private List<Integer> getDefaultRuntimeRatios(List<Processor> processors) {
+        List<Integer> ratios = new ArrayList<Integer>();
+
+        for (int i = 1; i <= processors.size(); i++) {
+            ratios.add(i);
+        }
+
+        return ratios;
     }
 
     @Override

@@ -28,16 +28,12 @@ import java.util.Map;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.ProcessorSelectorStrategy;
 
+import org.apache.camel.Processor;
+
 public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSelectorStrategy {
 
-    private Map<String, Integer> routeNamesToProcessors;
-
-    public MeanProcessingTimeProcessorSelectorStrategy(Map<String, Integer> routeNamesToProcessors) {
-        this.routeNamesToProcessors = routeNamesToProcessors;
-    }
-
     @Override
-    public int getBestProcessorIndex(List<RouteStatistics> stats) {
+    public Processor getProcessor(List<RouteStatistics> stats) {
         RouteStatistics best = null;
         for (RouteStatistics current : stats) {
             if (best == null) {
@@ -47,16 +43,17 @@ public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSel
             best = best.getMeanProcessingTime() <= current.getMeanProcessingTime() ? best : current;
         }
 
-        return routeNamesToProcessors.get(best.getRouteName());
+        return best.getProcessorHolder().getProcessor();
     }
 
     @Override
-    public List<Integer> getOrderedProcessorIndexs(List<RouteStatistics> stats) {
+    public List<Integer> getWeightedProcessors(List<RouteStatistics> stats) {
         Collections.sort(stats, new RouteStatisticsComparator());
 
+        //todo: need to check....
         List<Integer> indexes = new LinkedList<Integer>();
-        for (RouteStatistics current : stats) {
-            indexes.add(routeNamesToProcessors.get(current.getRouteName()));
+        for (int i = stats.size(); i > stats.size(); i--) {
+            indexes.add(i);
         }
 
         return indexes;

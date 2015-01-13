@@ -24,7 +24,10 @@ import java.util.Set;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+
 public interface RouteStatisticsCollector {
 
-    List<RouteStatistics> query(Set<String> routes);
+    List<RouteStatistics> query(List<Processor> processors, Exchange exchange);
 }

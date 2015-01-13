@@ -29,6 +29,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import com.garethahealy.camel.dynamic.loadbalancer.statistics.StatisticsCollectorType;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.RouteStatisticsCollector;
 
 import org.apache.camel.CamelContext;
@@ -51,21 +52,49 @@ public abstract class BaseMBeanAttributeCollector implements RouteStatisticsColl
         this.agent = camelContext.getManagementStrategy().getManagementAgent();
     }
 
-    //public abstract List<RouteStatistics> query(Collection<String> routes);
+    protected Set<ObjectName> queryNames(String name, StatisticsCollectorType type) {
+        ObjectName objectName = null;
+        if (type == StatisticsCollectorType.ROUTE) {
+            objectName = createRouteObjectName(name);
+        } else if (type == StatisticsCollectorType.PROCESSOR) {
+            objectName = createProcessorObjectName(name);
+        } else if (type == StatisticsCollectorType.ALL_ROUTES) {
+            objectName = createAllRoutesObjectName();
+        } else {
+            LOG.error("StatisticsCollectorType '{}' is not supported for {}", type.value(), name);
+        }
 
-    protected Set<ObjectName> queryNames(String routeName) {
-        return mBeanServer.queryNames(createRouteObjectName(routeName), null);
+        return mBeanServer.queryNames(objectName, null);
     }
 
-    private ObjectName createRouteObjectName(String route) {
-        ObjectName name = null;
+    private ObjectName createRouteObjectName(String routeId) {
+        return createObjectName("routes", routeId);
+    }
+
+    private ObjectName createProcessorObjectName(String processorId) {
+        return createObjectName("processors", processorId);
+    }
+
+    private ObjectName createObjectName(String type, String name) {
+        ObjectName objectName = null;
         try {
-            name = new ObjectName(agent.getMBeanObjectDomainName() + ":type=routes,name=\"" + route + "\",*");
+            objectName = new ObjectName(agent.getMBeanObjectDomainName() + ":type=\"" + type + "\",name=\"" + name + "\",*");
         } catch (MalformedObjectNameException ex) {
             LOG.error(ExceptionUtils.getStackTrace(ex));
         }
 
-        return name;
+        return objectName;
+    }
+
+    private ObjectName createAllRoutesObjectName() {
+        ObjectName objectName = null;
+        try {
+            objectName = new ObjectName(agent.getMBeanObjectDomainName() + ":type=routes,*");
+        } catch (MalformedObjectNameException ex) {
+            LOG.error(ExceptionUtils.getStackTrace(ex));
+        }
+
+        return objectName;
     }
 
     protected Long getLongAttribute(ObjectName routeMBean, String attribute) {

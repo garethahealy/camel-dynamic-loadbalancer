@@ -29,11 +29,32 @@
 
     <cm:property-placeholder persistent-id="com.garethahealy.camel.dynamic.loadbalancer.example1" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="todo" value="1"/>
+            <cm:property name="collectorstrategy.warmup" value="0"/>
+            <cm:property name="collectorstrategy.everyx" value="1"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <bean id="dynamicLoadBalancerConfiguration" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicLoadBalancerConfiguration"/>
+    <reference id="mbeanServer" interface="javax.management.MBeanServer" availability="mandatory"/>
+
+    <bean id="meanProcessingTimeProcessorSelectorStrategy" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.MeanProcessingTimeProcessorSelectorStrategy"/>
+
+    <bean id="everyXDeterministicCollectorStrategy" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.EveryXDeterministicCollectorStrategy">
+        <argument value="${collectorstrategy.warmup}"/>
+        <argument value="${collectorstrategy.everyx}"/>
+    </bean>
+
+    <bean id="MBeanRouteStatisticsCollector" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.mbeans.MBeanRouteStatisticsCollector">
+        <argument ref="dynamic-lb-example1-context"/>
+        <argument ref="mbeanServer"/>
+        <argument value="route"/>
+    </bean>
+
+    <bean id="dynamicLoadBalancerConfiguration" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicLoadBalancerConfiguration">
+        <argument ref="meanProcessingTimeProcessorSelectorStrategy"/>
+        <argument ref="everyXDeterministicCollectorStrategy"/>
+        <argument ref="MBeanRouteStatisticsCollector"/>
+        <argument ref="routeNamesToProcessors"/>
+    </bean>
 
     <bean id="dynamicWeightedLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicRoundRobinLoadBalancer">
         <argument ref="dynamicLoadBalancerConfiguration"/>
@@ -41,13 +62,13 @@
 
     <camelContext id="dynamic-lb-example1-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
 
-        <route>
+        <route id="loadBalancerStart">
             <from uri="direct:start"/>
             <loadBalance>
                 <custom ref="dynamicWeightedLoadBalancer"/>
-                <to uri="direct:readerOne"/>
+                <to uri="direct-vm:readerOne" id="dynamicWeightedLoadBalancer-readerOne-0"/>
                 <to uri="direct:readerTwo"/>
-                <to uri="direct:readerThree"/>
+                <to uri="vm:readerThree"/>
             </loadBalance>
         </route>
 

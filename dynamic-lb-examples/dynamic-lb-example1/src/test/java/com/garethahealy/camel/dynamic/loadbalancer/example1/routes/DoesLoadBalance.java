@@ -19,6 +19,21 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.example1.routes;
 
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
+import org.apache.camel.processor.interceptor.DefaultChannel;
+import org.junit.Assert;
+import org.junit.Test;
+
 public class DoesLoadBalance extends BaseCamelBlueprintTestSupport {
 
+    @Produce(uri = "direct:start")
+    private ProducerTemplate startProducerTemplate;
+
+    @Test
+    public void can() {
+        startProducerTemplate.sendBody("message1");
+
+        Assert.assertTrue(true);
+    }
 }

@@ -24,9 +24,11 @@ import java.util.Map;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 
+import org.apache.camel.Processor;
+
 public interface ProcessorSelectorStrategy {
 
-    int getBestProcessorIndex(List<RouteStatistics> stats);
+    Processor getProcessor(List<RouteStatistics> stats);
 
-    List<Integer> getOrderedProcessorIndexs(List<RouteStatistics> stats);
+    List<Integer> getWeightedProcessors(List<RouteStatistics> stats);
 }

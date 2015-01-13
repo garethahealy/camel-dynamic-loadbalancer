@@ -20,13 +20,12 @@
 package com.garethahealy.camel.dynamic.loadbalancer.core;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.EveryXDeterministicCollectorStrategy;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.MeanProcessingTimeProcessorSelectorStrategy;
+import com.garethahealy.camel.dynamic.loadbalancer.statistics.ProcessorHolder;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.RouteStatisticsCollector;
 
@@ -40,40 +39,39 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
 
     @Test
     public void handlesTwoProcessors() {
-        Map<String, Integer> routeNamesAndProcessors = new HashMap<String, Integer>();
-        routeNamesAndProcessors.put("route1", 0);
-        routeNamesAndProcessors.put("route2", 1);
+        ProcessorHolder processorHolder1 = new ProcessorHolder();
+        processorHolder1.setProcessor(Mockito.mock(Processor.class));
+
+        ProcessorHolder processorHolder2 = new ProcessorHolder();
+        processorHolder2.setProcessor(Mockito.mock(Processor.class));
 
         RouteStatistics stat1 = new RouteStatistics();
-        stat1.setRouteName("route1");
+        stat1.setProcessorHolder(processorHolder1);
         stat1.setMeanProcessingTime(12345L);
 
         RouteStatistics stat2 = new RouteStatistics();
-        stat2.setRouteName("route2");
-        stat2.setMeanProcessingTime(1L);
+        stat2.setProcessorHolder(processorHolder2);
+        stat2.setMeanProcessingTime(54321L);
 
         List<RouteStatistics> stats = new ArrayList<RouteStatistics>();
         stats.add(stat1);
         stats.add(stat2);
 
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(processorHolder1.getProcessor());
+        processors.add(processorHolder2.getProcessor());
+
         RouteStatisticsCollector routeStatisticsCollectorMocked = Mockito.mock(RouteStatisticsCollector.class);
-        Mockito.when(routeStatisticsCollectorMocked.query(routeNamesAndProcessors.keySet())).thenReturn(stats);
+        Mockito.when(routeStatisticsCollectorMocked.query(processors, exchange)).thenReturn(stats);
 
         DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
         config.setRouteStatisticsCollector(routeStatisticsCollectorMocked);
         config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(1, 10));
-        config.setRouteNames(routeNamesAndProcessors.keySet());
-        config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy(routeNamesAndProcessors));
-
-        List<Processor> processors = new LinkedList<Processor>();
-        processors.add(Mockito.mock(Processor.class));
-        processors.add(Mockito.mock(Processor.class));
+        config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
 
         DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
-        Processor answer = loadBalancer.chooseProcessor(processors, createExchange());
+        Processor answer = loadBalancer.chooseProcessor(processors, exchange);
 
         Assert.assertNotNull(answer);
-
-        //TODO:
     }
 }
