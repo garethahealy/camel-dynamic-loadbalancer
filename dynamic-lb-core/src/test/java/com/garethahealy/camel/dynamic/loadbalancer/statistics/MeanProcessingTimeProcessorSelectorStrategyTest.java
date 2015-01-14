@@ -33,7 +33,7 @@ import org.mockito.Mockito;
 public class MeanProcessingTimeProcessorSelectorStrategyTest {
 
     @Test
-    public void getProcessorIndexCorrect() {
+    public void getProcessorReturnsCorrect() {
         ProcessorHolder processorHolder1 = new ProcessorHolder();
         processorHolder1.setProcessor(Mockito.mock(Processor.class));
 
@@ -60,10 +60,11 @@ public class MeanProcessingTimeProcessorSelectorStrategyTest {
         Processor processor = strategy.getProcessor(stats);
 
         Assert.assertNotNull(processor);
+        Assert.assertEquals(processorHolder1.getProcessor(), processor);
     }
 
     @Test
-    public void getProcessorIndexCorrectWithMultpleStats() {
+    public void getProcessorReturnsCorrectWithMultpleStats() {
         ProcessorHolder processorHolder1 = new ProcessorHolder();
         processorHolder1.setProcessor(Mockito.mock(Processor.class));
 
@@ -99,5 +100,6 @@ public class MeanProcessingTimeProcessorSelectorStrategyTest {
         Processor processor = strategy.getProcessor(stats);
 
         Assert.assertNotNull(processor);
+        Assert.assertEquals(processorHolder2.getProcessor(), processor);
     }
 }

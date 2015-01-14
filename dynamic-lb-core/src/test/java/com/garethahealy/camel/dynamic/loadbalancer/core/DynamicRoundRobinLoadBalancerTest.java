@@ -75,5 +75,6 @@ public class DynamicRoundRobinLoadBalancerTest extends ExchangeTestSupport {
         Processor answer = loadBalancer.chooseProcessor(processors, createExchange());
 
         Assert.assertNotNull(answer);
+        Assert.assertEquals(processorHolder1.getProcessor(), answer);
     }
 }

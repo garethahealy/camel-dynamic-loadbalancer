@@ -21,7 +21,6 @@ package com.garethahealy.camel.dynamic.loadbalancer.example1.routes;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.processor.interceptor.DefaultChannel;
 import org.junit.Assert;
 import org.junit.Test;
 

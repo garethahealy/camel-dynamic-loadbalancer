@@ -53,7 +53,6 @@
         <argument ref="meanProcessingTimeProcessorSelectorStrategy"/>
         <argument ref="everyXDeterministicCollectorStrategy"/>
         <argument ref="MBeanRouteStatisticsCollector"/>
-        <argument ref="routeNamesToProcessors"/>
     </bean>
 
     <bean id="dynamicWeightedLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicRoundRobinLoadBalancer">
