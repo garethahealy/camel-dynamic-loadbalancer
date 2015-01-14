@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoadBalancer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DynamicWeightedRoundRobinLoadBalancer.class);
+
     private DynamicLoadBalancerConfiguration config;
 
     public DynamicWeightedRoundRobinLoadBalancer(DynamicLoadBalancerConfiguration config) {
@@ -73,6 +75,8 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
         for (int i = 1; i <= processors.size(); i++) {
             ratios.add(i);
         }
+
+        LOG.debug("Defaulting weights as '{}'", ratios.toArray());
 
         return ratios;
     }

@@ -24,13 +24,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.ProcessorSelectorStrategy;
 
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSelectorStrategy {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MeanProcessingTimeProcessorSelectorStrategy.class);
 
     @Override
     public Processor getProcessor(List<RouteStatistics> stats) {
@@ -42,6 +45,8 @@ public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSel
 
             best = best.getMeanProcessingTime() <= current.getMeanProcessingTime() ? best : current;
         }
+
+        LOG.debug("Found '{}' is the best processor", best);
 
         return best.getProcessorHolder().getProcessor();
     }
@@ -55,6 +60,8 @@ public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSel
         for (int i = stats.size(); i > stats.size(); i--) {
             indexes.add(i);
         }
+
+        LOG.debug("Found '{}' for weights on the processors", indexes.toArray());
 
         return indexes;
     }

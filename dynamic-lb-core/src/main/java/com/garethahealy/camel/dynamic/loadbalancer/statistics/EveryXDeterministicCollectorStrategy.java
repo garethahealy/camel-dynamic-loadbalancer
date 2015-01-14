@@ -25,8 +25,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.DeterministicCollectorStrategy;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EveryXDeterministicCollectorStrategy implements DeterministicCollectorStrategy {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EveryXDeterministicCollectorStrategy.class);
 
     private AtomicInteger counter = new AtomicInteger(0);
     private AtomicBoolean hasWarmedUp = new AtomicBoolean(false);
@@ -52,6 +56,8 @@ public class EveryXDeterministicCollectorStrategy implements DeterministicCollec
 
             answer = true;
         }
+
+        LOG.debug("shouldCollect is '{}'", answer);
 
         return answer;
     }
