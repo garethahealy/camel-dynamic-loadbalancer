@@ -30,8 +30,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.processor.loadbalancer.RoundRobinLoadBalancer;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
 

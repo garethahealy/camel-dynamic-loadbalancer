@@ -53,7 +53,7 @@ public abstract class BaseMBeanAttributeCollector implements RouteStatisticsColl
     protected Set<ObjectName> queryNames(String camelContextName, String name, StatisticsCollectorType type) {
         ObjectName objectName = null;
         if (type == StatisticsCollectorType.ROUTE) {
-            objectName = createRouteObjectName(camelContextName, name);
+            objectName = createRouteObjectName(name);
         } else if (type == StatisticsCollectorType.PROCESSOR) {
             objectName = createProcessorObjectName(name);
         } else if (type == StatisticsCollectorType.ALL_ROUTES) {
@@ -65,10 +65,8 @@ public abstract class BaseMBeanAttributeCollector implements RouteStatisticsColl
         return mBeanServer.queryNames(objectName, null);
     }
 
-    private ObjectName createRouteObjectName(String camelContextName, String routeId) {
-        //TODO: Dont think Context doesnt match example below, thus we get 0 back
-        //org.apache.camel:context=com.garethahealy.camel.dynamic-lb-example1,type=routes,name="loadBalancerStart"
-        return createObjectName(":context=\"" + camelContextName + "\",type=routes,name=\"" + routeId + "\",*");
+    private ObjectName createRouteObjectName(String routeId) {
+        return createObjectName(":type=routes,name=\"" + routeId + "\",*");
     }
 
     private ObjectName createProcessorObjectName(String processorId) {

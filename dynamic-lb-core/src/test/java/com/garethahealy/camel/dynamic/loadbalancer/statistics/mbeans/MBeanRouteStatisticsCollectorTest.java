@@ -90,6 +90,8 @@ public class MBeanRouteStatisticsCollectorTest extends ExchangeTestSupport {
         provideRouteStats(mBeanServerMocked, objectNames);
         provideAllRoutes(mBeanServerMocked, objectNames);
 
+        //TODO: update as failing test
+
         DirectComponent component = new DirectComponent();
         component.setCamelContext(context);
 

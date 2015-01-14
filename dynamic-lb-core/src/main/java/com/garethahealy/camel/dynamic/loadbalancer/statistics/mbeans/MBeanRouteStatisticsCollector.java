@@ -104,16 +104,19 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
         if (iterator.hasNext()) {
             ObjectName foundMBean = iterator.next();
 
-            stats = new RouteStatistics();
-            stats.setProcessorHolder(processorHolders.get(normalizeUri(getStringAttribute(foundMBean, "EndpointUri"))));
-            stats.setInflightExchange(getIntegerAttribute(foundMBean, "InflightExchanges"));
-            stats.setMeanProcessingTime(getLongAttribute(foundMBean, "MeanProcessingTime"));
-            stats.setLastProcessingTime(getLongAttribute(foundMBean, "LastProcessingTime"));
-            stats.setLoad01(getStringAttribute(foundMBean, "Load01"));
-            stats.setLoad05(getStringAttribute(foundMBean, "Load05"));
-            stats.setLoad15(getStringAttribute(foundMBean, "Load15"));
+            String camelId = getStringAttribute(foundMBean, "CamelId");
+            if (camelId != null && camelId.equalsIgnoreCase(camelContextName)) {
+                stats = new RouteStatistics();
+                stats.setProcessorHolder(processorHolders.get(normalizeUri(getStringAttribute(foundMBean, "EndpointUri"))));
+                stats.setInflightExchange(getIntegerAttribute(foundMBean, "InflightExchanges"));
+                stats.setMeanProcessingTime(getLongAttribute(foundMBean, "MeanProcessingTime"));
+                stats.setLastProcessingTime(getLongAttribute(foundMBean, "LastProcessingTime"));
+                stats.setLoad01(getStringAttribute(foundMBean, "Load01"));
+                stats.setLoad05(getStringAttribute(foundMBean, "Load05"));
+                stats.setLoad15(getStringAttribute(foundMBean, "Load15"));
 
-            LOG.debug("Found '{}' stats for '{}' '{}'", stats, camelContextName, name);
+                LOG.debug("Found '{}' stats for '{}' '{}'", stats, camelContextName, name);
+            }
         }
 
         return stats;

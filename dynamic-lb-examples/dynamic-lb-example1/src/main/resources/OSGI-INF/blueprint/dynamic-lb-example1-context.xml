@@ -29,12 +29,14 @@
 
     <cm:property-placeholder persistent-id="com.garethahealy.camel.dynamic.loadbalancer.example1" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="collectorstrategy.warmup" value="0"/>
-            <cm:property name="collectorstrategy.everyx" value="1"/>
+            <cm:property name="collectorstrategy.warmup" value="100"/>
+            <cm:property name="collectorstrategy.everyx" value="1000"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
     <reference id="mbeanServer" interface="javax.management.MBeanServer" availability="mandatory"/>
+
+    <bean id="sleeper" class="com.garethahealy.camel.dynamic.loadbalancer.examples.example1.Sleeper"/>
 
     <bean id="meanProcessingTimeProcessorSelectorStrategy" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.MeanProcessingTimeProcessorSelectorStrategy"/>
 
@@ -62,38 +64,39 @@
     <camelContext id="dynamic-lb-example1-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
 
         <route id="spamLoadBalancer">
-            <from uri="timer://spamLoadBalancer?delay=10s&amp;period=100&amp;repeatCount=100"/>
+            <from uri="timer://spamLoadBalancer?delay=10s&amp;period=100"/>
             <setBody>
                 <simple>Hello LoadBalancer. I am ${property.CamelTimerCounter}</simple>
             </setBody>
-            <log message="${body}"/>
-            <to uri="direct:start"/>
+            <to uri="seda:start"/>
         </route>
 
         <route id="loadBalancerStart">
-            <from uri="direct:start"/>
+            <from uri="seda:start"/>
             <loadBalance>
                 <custom ref="dynamicWeightedLoadBalancer"/>
-                <to uri="direct-vm:readerOne" id="dynamicWeightedLoadBalancer-readerOne-0"/>
-                <to uri="direct:readerTwo"/>
-                <to uri="vm:readerThree"/>
+                <to uri="seda:readerOne" id="dynamicWeightedLoadBalancer-readerOne-0"/>
+                <to uri="seda:readerTwo"/>
+                <to uri="seda:readerThree"/>
             </loadBalance>
         </route>
 
         <route id="readerOne">
-            <from uri="direct-vm:readerOne"/>
+            <from uri="seda:readerOne"/>
             <log message="Got ${body} from readerOne"/>
+            <bean ref="sleeper" method="sleep1Second"/>
             <to uri="mock:readerOneEnd"/>
         </route>
 
         <route id="readerTwo">
-            <from uri="direct:readerTwo"/>
+            <from uri="seda:readerTwo"/>
             <log message="Got ${body} from readerTwo"/>
+            <bean ref="sleeper" method="sleep5Second"/>
             <to uri="mock:readerTwoEnd"/>
         </route>
 
         <route id="readerThree">
-            <from uri="vm:readerThree"/>
+            <from uri="seda:readerThree"/>
             <log message="Got ${body} from readerThree"/>
             <to uri="mock:readerThreeEnd"/>
         </route>

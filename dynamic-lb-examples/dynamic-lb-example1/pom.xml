@@ -18,7 +18,7 @@
             com.garethahealy.camel.dynamic.loadbalancer.core,
             com.garethahealy.camel.dynamic.loadbalancer.statistics
         </build.osgi.import.before.defaults>
-        <build.osgi.export.pkg>com.garethahealy.camel.dynamic.loadbalancer.example1.*</build.osgi.export.pkg>
+        <build.osgi.export.pkg>com.garethahealy.camel.dynamic.loadbalancer.examples.example1.*</build.osgi.export.pkg>
         <build.osgi.export.service/>
         <build.osgi.activator/>
     </properties>
