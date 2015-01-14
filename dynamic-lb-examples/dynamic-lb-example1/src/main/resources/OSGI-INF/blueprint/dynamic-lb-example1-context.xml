@@ -61,6 +61,15 @@
 
     <camelContext id="dynamic-lb-example1-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
 
+        <route id="spamLoadBalancer">
+            <from uri="timer://spamLoadBalancer?delay=10s&amp;period=100&amp;repeatCount=100"/>
+            <setBody>
+                <simple>Hello LoadBalancer. I am ${property.CamelTimerCounter}</simple>
+            </setBody>
+            <log message="${body}"/>
+            <to uri="direct:start"/>
+        </route>
+
         <route id="loadBalancerStart">
             <from uri="direct:start"/>
             <loadBalance>
@@ -72,7 +81,7 @@
         </route>
 
         <route id="readerOne">
-            <from uri="direct:readerOne"/>
+            <from uri="direct-vm:readerOne"/>
             <log message="Got ${body} from readerOne"/>
             <to uri="mock:readerOneEnd"/>
         </route>
@@ -84,7 +93,7 @@
         </route>
 
         <route id="readerThree">
-            <from uri="direct:readerThree"/>
+            <from uri="vm:readerThree"/>
             <log message="Got ${body} from readerThree"/>
             <to uri="mock:readerThreeEnd"/>
         </route>
