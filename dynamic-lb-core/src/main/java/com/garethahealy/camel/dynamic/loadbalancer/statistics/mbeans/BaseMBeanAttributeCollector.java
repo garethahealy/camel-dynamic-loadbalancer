@@ -42,20 +42,18 @@ public abstract class BaseMBeanAttributeCollector implements RouteStatisticsColl
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseMBeanAttributeCollector.class);
 
-    protected String camelContextName;
     private ManagementAgent agent;
     private MBeanServer mBeanServer;
 
     public BaseMBeanAttributeCollector(CamelContext camelContext, MBeanServer mBeanServer) {
-        this.camelContextName = camelContext.getName();
         this.mBeanServer = mBeanServer;
         this.agent = camelContext.getManagementStrategy().getManagementAgent();
     }
 
-    protected Set<ObjectName> queryNames(String name, StatisticsCollectorType type) {
+    protected Set<ObjectName> queryNames(String camelContextName, String name, StatisticsCollectorType type) {
         ObjectName objectName = null;
         if (type == StatisticsCollectorType.ROUTE) {
-            objectName = createRouteObjectName(name);
+            objectName = createRouteObjectName(camelContextName, name);
         } else if (type == StatisticsCollectorType.PROCESSOR) {
             objectName = createProcessorObjectName(name);
         } else if (type == StatisticsCollectorType.ALL_ROUTES) {
@@ -67,18 +65,20 @@ public abstract class BaseMBeanAttributeCollector implements RouteStatisticsColl
         return mBeanServer.queryNames(objectName, null);
     }
 
-    private ObjectName createRouteObjectName(String routeId) {
-        return createObjectName("routes", routeId);
+    private ObjectName createRouteObjectName(String camelContextName, String routeId) {
+        //TODO: Dont think Context doesnt match example below, thus we get 0 back
+        //org.apache.camel:context=com.garethahealy.camel.dynamic-lb-example1,type=routes,name="loadBalancerStart"
+        return createObjectName(":context=\"" + camelContextName + "\",type=routes,name=\"" + routeId + "\",*");
     }
 
     private ObjectName createProcessorObjectName(String processorId) {
-        return createObjectName("processors", processorId);
+        return createObjectName(":type=processors,name=\"" + processorId + "\",*");
     }
 
-    private ObjectName createObjectName(String type, String name) {
+    private ObjectName createObjectName(String query) {
         ObjectName objectName = null;
         try {
-            objectName = new ObjectName(agent.getMBeanObjectDomainName() + ":type=\"" + type + "\",name=\"" + name + "\",*");
+            objectName = new ObjectName(agent.getMBeanObjectDomainName() + query);
         } catch (MalformedObjectNameException ex) {
             LOG.error(ExceptionUtils.getStackTrace(ex));
         }

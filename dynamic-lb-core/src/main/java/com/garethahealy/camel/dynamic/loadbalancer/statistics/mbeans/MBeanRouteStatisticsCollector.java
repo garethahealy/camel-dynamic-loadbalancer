@@ -19,7 +19,9 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.statistics.mbeans;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,11 +40,17 @@ import com.garethahealy.camel.dynamic.loadbalancer.statistics.StatisticsCollecto
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.processor.SendProcessor;
+import org.apache.camel.model.ToDefinition;
 import org.apache.camel.processor.interceptor.DefaultChannel;
+import org.apache.camel.util.URISupport;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MBeanRouteStatisticsCollector.class);
 
     private StatisticsCollectorType statisticsCollectorType;
 
@@ -58,7 +66,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
         List<RouteStatistics> stats = new ArrayList<RouteStatistics>();
         for (RouteHolder current : routeHolders) {
-            stats.add(query(processorHolders, current.getRouteName()));
+            stats.add(query(processorHolders, current.getCamelContextName(), current.getRouteName()));
         }
 
         return stats;
@@ -67,12 +75,12 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
     private List<RouteHolder> getRouteNames(Map<String, ProcessorHolder> processorHolders) {
         List<RouteHolder> holders = new ArrayList<RouteHolder>();
 
-        Set<ObjectName> set = queryNames(null, StatisticsCollectorType.ALL_ROUTES);
+        Set<ObjectName> set = queryNames(null, null, StatisticsCollectorType.ALL_ROUTES);
         Iterator<ObjectName> iterator = set.iterator();
         while (iterator.hasNext()) {
             ObjectName foundMBean = iterator.next();
 
-            String uri = getStringAttribute(foundMBean, "EndpointUri");
+            String uri = normalizeUri(getStringAttribute(foundMBean, "EndpointUri"));
             if (processorHolders.containsKey(uri)) {
                 RouteHolder holder = new RouteHolder();
                 holder.setCamelContextName(getStringAttribute(foundMBean, "CamelId"));
@@ -83,28 +91,29 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
             }
         }
 
+        LOG.debug("Found '{}' routes which match the processors", holders.toArray());
+
         return holders;
     }
 
-    private RouteStatistics query(Map<String, ProcessorHolder> processorHolders, String name) {
+    private RouteStatistics query(Map<String, ProcessorHolder> processorHolders, String camelContextName, String name) {
         RouteStatistics stats = null;
 
-        Set<ObjectName> set = queryNames(name, statisticsCollectorType);
+        Set<ObjectName> set = queryNames(camelContextName, name, statisticsCollectorType);
         Iterator<ObjectName> iterator = set.iterator();
         if (iterator.hasNext()) {
             ObjectName foundMBean = iterator.next();
 
-            String camelId = getStringAttribute(foundMBean, "CamelId");
-            if (camelId != null && camelId.equalsIgnoreCase(camelContextName)) {
-                stats = new RouteStatistics();
-                stats.setProcessorHolder(processorHolders.get(getStringAttribute(foundMBean, "EndpointUri")));
-                stats.setInflightExchange(getIntegerAttribute(foundMBean, "InflightExchanges"));
-                stats.setMeanProcessingTime(getLongAttribute(foundMBean, "MeanProcessingTime"));
-                stats.setLastProcessingTime(getLongAttribute(foundMBean, "LastProcessingTime"));
-                stats.setLoad01(getStringAttribute(foundMBean, "Load01"));
-                stats.setLoad05(getStringAttribute(foundMBean, "Load05"));
-                stats.setLoad15(getStringAttribute(foundMBean, "Load15"));
-            }
+            stats = new RouteStatistics();
+            stats.setProcessorHolder(processorHolders.get(normalizeUri(getStringAttribute(foundMBean, "EndpointUri"))));
+            stats.setInflightExchange(getIntegerAttribute(foundMBean, "InflightExchanges"));
+            stats.setMeanProcessingTime(getLongAttribute(foundMBean, "MeanProcessingTime"));
+            stats.setLastProcessingTime(getLongAttribute(foundMBean, "LastProcessingTime"));
+            stats.setLoad01(getStringAttribute(foundMBean, "Load01"));
+            stats.setLoad05(getStringAttribute(foundMBean, "Load05"));
+            stats.setLoad15(getStringAttribute(foundMBean, "Load15"));
+
+            LOG.debug("Found '{}' stats for '{}' '{}'", stats, camelContextName, name);
         }
 
         return stats;
@@ -119,16 +128,16 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
                 Object outputValue = null;
                 try {
-                    Field outputField = FieldUtils.getField(DefaultChannel.class, "output", true);
+                    Field outputField = FieldUtils.getField(DefaultChannel.class, "childDefinition", true);
                     outputValue = FieldUtils.readField(outputField, currentChannel, true);
                 } catch (IllegalAccessException ex) {
                     //ignore
                 }
 
-                if (outputValue != null && outputValue instanceof SendProcessor) {
-                    SendProcessor sendProcessor = (SendProcessor)outputValue;
+                if (outputValue != null && outputValue instanceof ToDefinition) {
+                    ToDefinition to = (ToDefinition)outputValue;
 
-                    String uri = sendProcessor.getDestination().getEndpointUri();
+                    String uri = normalizeUri(to.getUri());
 
                     ProcessorHolder holder = new ProcessorHolder();
                     holder.setCamelContextName(exchange.getContext().getName());
@@ -141,6 +150,21 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
             }
         }
 
+        LOG.debug("Found '{}' processors'", answer.values().toArray());
+
         return answer;
+    }
+
+    private String normalizeUri(String uri) {
+        String normalizeUri = "";
+        try {
+            normalizeUri = URISupport.normalizeUri(uri);
+        } catch (URISyntaxException ex) {
+            LOG.error(ExceptionUtils.getStackTrace(ex));
+        } catch (UnsupportedEncodingException ex) {
+            LOG.error(ExceptionUtils.getStackTrace(ex));
+        }
+
+        return normalizeUri;
     }
 }
