@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.garethahealy.camel</groupId>
-        <artifactId>dynamic-lb-parent</artifactId>
+        <artifactId>camel-dynamic-loadbalancer-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../dynamic-lb-parent</relativePath>
+        <relativePath>../</relativePath>
     </parent>
     <artifactId>dynamic-lb-examples</artifactId>
     <packaging>pom</packaging>
