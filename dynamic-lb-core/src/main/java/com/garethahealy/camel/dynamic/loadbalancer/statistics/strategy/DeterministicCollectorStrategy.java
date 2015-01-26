@@ -19,7 +19,17 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy;
 
+/**
+ * Strategy to determine whether to collect stats
+ *
+ * @version
+ */
 public interface DeterministicCollectorStrategy {
 
+    /**
+     * Collect stats or not
+     *
+     * @return
+     */
     boolean shouldCollect();
 }

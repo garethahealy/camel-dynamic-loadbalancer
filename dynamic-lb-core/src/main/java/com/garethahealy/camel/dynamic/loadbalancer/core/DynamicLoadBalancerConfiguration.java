@@ -26,7 +26,9 @@ import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.RouteStat
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
+ * Configuration for the dynamic load balancer
  *
+ * @version
  */
 public class DynamicLoadBalancerConfiguration {
 

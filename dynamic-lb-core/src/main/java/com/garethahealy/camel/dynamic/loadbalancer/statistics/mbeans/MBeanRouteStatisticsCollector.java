@@ -49,6 +49,12 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Collects stats on routes or processors used by the load balancer,
+ * so that we can select the next processor which a message is sent to
+ *
+ * @version
+ */
 public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
     private static final Logger LOG = LoggerFactory.getLogger(MBeanRouteStatisticsCollector.class);
@@ -68,6 +74,13 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
         this.shouldCacheRouteHolders = shouldCacheRouteHolders;
     }
 
+    /**
+     * Query stats for processors
+     *
+     * @param processors
+     * @param exchange
+     * @return
+     */
     public List<RouteStatistics> query(List<Processor> processors, Exchange exchange) {
         Map<String, ProcessorHolder> processorHolders = getProcessorHolders(processors, exchange);
         List<RouteHolder> routeHolders = getRouteNames(processorHolders);
@@ -80,6 +93,12 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
         return stats;
     }
 
+    /**
+     * Get the route info which is matched against the processor info. i.e.: Processor URI -> Route FROM URI
+     *
+     * @param processorHolders
+     * @return
+     */
     private List<RouteHolder> getRouteNames(Map<String, ProcessorHolder> processorHolders) {
         if (!shouldCacheRouteHolders || routeHoldersCache == null || routeHoldersCache.size() <= 0) {
             routeHoldersCache = new ArrayList<RouteHolder>();
@@ -110,6 +129,14 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
         return routeHoldersCache;
     }
 
+    /**
+     * Get the stats for a MBean object, either a route or processor
+     *
+     * @param processorHolders
+     * @param camelContextName
+     * @param name
+     * @return
+     */
     private RouteStatistics query(Map<String, ProcessorHolder> processorHolders, String camelContextName, String name) {
         RouteStatistics stats = null;
 
@@ -136,36 +163,27 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
         return stats;
     }
 
+    /**
+     * Get a map which contains the processor URI (key) and processor info (value)
+     *
+     * @param processors
+     * @param exchange
+     * @return
+     */
     private Map<String, ProcessorHolder> getProcessorHolders(List<Processor> processors, Exchange exchange) {
         if (!shouldCacheProcessorHolders || processorHoldersCache == null || processorHoldersCache.size() <= 0) {
             processorHoldersCache = new HashMap<String, ProcessorHolder>();
 
             for (Processor current : processors) {
-                if (current instanceof DefaultChannel) {
-                    DefaultChannel currentChannel = (DefaultChannel)current;
+                String uri = getUriFromProcessor(current);
 
-                    Object outputValue = null;
-                    try {
-                        Field outputField = FieldUtils.getField(DefaultChannel.class, "childDefinition", true);
-                        outputValue = FieldUtils.readField(outputField, currentChannel, true);
-                    } catch (IllegalAccessException ex) {
-                        //ignore
-                    }
+                ProcessorHolder holder = new ProcessorHolder();
+                holder.setCamelContextName(exchange.getContext().getName());
+                holder.setRouteName(exchange.getFromRouteId());
+                holder.setUri(uri);
+                holder.setProcessor(current);
 
-                    if (outputValue != null && outputValue instanceof ToDefinition) {
-                        ToDefinition to = (ToDefinition)outputValue;
-
-                        String uri = normalizeUri(to.getUri());
-
-                        ProcessorHolder holder = new ProcessorHolder();
-                        holder.setCamelContextName(exchange.getContext().getName());
-                        holder.setRouteName(exchange.getFromRouteId());
-                        holder.setUri(uri);
-                        holder.setProcessor(current);
-
-                        processorHoldersCache.put(uri, holder);
-                    }
-                }
+                processorHoldersCache.put(uri, holder);
             }
 
             if (processorHoldersCache.size() <= 0) {
@@ -178,6 +196,45 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
         return processorHoldersCache;
     }
 
+    /**
+     * Get the uri from the processor (NOTE: Current impl uses reflection, so could fail easily)
+     * @param current
+     * @return
+     */
+    private String getUriFromProcessor(Processor current) {
+        String uri = "";
+
+        //NOTE: What if camel uses different 'Channels', this wont work.
+        // How can i get the URI from the processor in a nice way?
+
+        if (current instanceof DefaultChannel) {
+            DefaultChannel currentChannel = (DefaultChannel)current;
+
+            Object outputValue = null;
+            try {
+                //NOTE: Shouldnt really be using reflection...
+                Field outputField = FieldUtils.getField(DefaultChannel.class, "childDefinition", true);
+                outputValue = FieldUtils.readField(outputField, currentChannel, true);
+            } catch (IllegalAccessException ex) {
+                //ignore
+            }
+
+            //NOTE: What if the definition isnt a To, its another type...
+            if (outputValue != null && outputValue instanceof ToDefinition) {
+                ToDefinition to = (ToDefinition)outputValue;
+
+                uri = normalizeUri(to.getUri());
+            }
+        }
+
+        return uri;
+    }
+
+    /**
+     * Normalize the URI so we can match easily
+     * @param uri
+     * @return
+     */
     private String normalizeUri(String uri) {
         String normalizeUri = "";
         try {

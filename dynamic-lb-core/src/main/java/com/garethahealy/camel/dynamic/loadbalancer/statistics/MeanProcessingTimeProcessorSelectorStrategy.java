@@ -31,6 +31,11 @@ import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Strategy which returns processor based on the mean processing time of the object
+ *
+ * @version
+ */
 public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSelectorStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(MeanProcessingTimeProcessorSelectorStrategy.class);

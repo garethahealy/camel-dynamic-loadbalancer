@@ -31,6 +31,11 @@ import org.apache.camel.Processor;
 import org.apache.camel.processor.loadbalancer.RoundRobinLoadBalancer;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+/**
+ * Dynamic load balancer that selects a processor based on metrics, else fallback to default round-robin
+ *
+ * @version
+ */
 public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
 
     private DynamicLoadBalancerConfiguration config;

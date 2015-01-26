@@ -21,6 +21,11 @@ package com.garethahealy.camel.dynamic.loadbalancer.statistics;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+/**
+ * Information about a route
+ *
+ * @version
+ */
 public class RouteHolder {
 
     private String camelContextName;

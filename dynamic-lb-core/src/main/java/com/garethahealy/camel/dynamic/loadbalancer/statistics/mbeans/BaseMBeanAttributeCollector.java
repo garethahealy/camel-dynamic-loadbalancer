@@ -38,6 +38,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Base impl for MBean stats collection
+ *
+ * @version
+ */
 public abstract class BaseMBeanAttributeCollector implements RouteStatisticsCollector {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseMBeanAttributeCollector.class);

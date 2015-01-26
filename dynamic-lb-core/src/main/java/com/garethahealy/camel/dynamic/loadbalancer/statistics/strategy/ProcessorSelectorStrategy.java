@@ -26,6 +26,11 @@ import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 
 import org.apache.camel.Processor;
 
+/**
+ * Strategy to determine which processor is selected based on stats provided
+ *
+ * @version
+ */
 public interface ProcessorSelectorStrategy {
 
     Processor getProcessor(List<RouteStatistics> stats);

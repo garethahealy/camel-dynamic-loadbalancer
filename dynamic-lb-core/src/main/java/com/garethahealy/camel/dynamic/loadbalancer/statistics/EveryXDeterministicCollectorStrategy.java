@@ -28,6 +28,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Strategy which returns true to collect once it has been called X amount of times
+ *
+ * @version
+ */
 public class EveryXDeterministicCollectorStrategy implements DeterministicCollectorStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(EveryXDeterministicCollectorStrategy.class);

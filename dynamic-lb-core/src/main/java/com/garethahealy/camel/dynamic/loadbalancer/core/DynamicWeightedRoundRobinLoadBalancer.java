@@ -34,6 +34,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Dynamic load balancer that updates the runtime ratios based on metrics
+ *
+ * @version
+ */
 public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoadBalancer {
 
     private static final Logger LOG = LoggerFactory.getLogger(DynamicWeightedRoundRobinLoadBalancer.class);
@@ -50,7 +55,7 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
     protected synchronized Processor chooseProcessor(List<Processor> processors, Exchange exchange) {
         DeterministicCollectorStrategy deterministicCollectorStrategy = config.getDeterministicCollectorStrategy();
 
-        if (getRuntimeRatios().size() <= 0) {
+        if (getRuntimeRatios().size() <= 0 || getRuntimeRatios().size() != processors.size()) {
             loadRuntimeRatios(getDefaultRuntimeRatios(processors));
         }
 

@@ -22,6 +22,11 @@ package com.garethahealy.camel.dynamic.loadbalancer.statistics;
 import org.apache.camel.Processor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+/**
+ * Information about a processor
+ *
+ * @version
+ */
 public class ProcessorHolder {
 
     private Processor processor;
