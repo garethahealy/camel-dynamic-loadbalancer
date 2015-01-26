@@ -105,7 +105,7 @@ public class MBeanRouteStatisticsCollectorTest extends ExchangeTestSupport {
         processors.add(processor1);
         processors.add(processor2);
 
-        MBeanRouteStatisticsCollector collector = new MBeanRouteStatisticsCollector(context, mBeanServerMocked, "route");
+        MBeanRouteStatisticsCollector collector = new MBeanRouteStatisticsCollector(context, mBeanServerMocked, "route", false, false);
         List<RouteStatistics> stats = collector.query(processors, createExchange());
 
         Assert.assertNotNull(stats);

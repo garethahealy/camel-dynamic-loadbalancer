@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,11 +54,18 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
     private static final Logger LOG = LoggerFactory.getLogger(MBeanRouteStatisticsCollector.class);
 
     private StatisticsCollectorType statisticsCollectorType;
+    private boolean shouldCacheProcessorHolders;
+    private boolean shouldCacheRouteHolders;
+    private Map<String, ProcessorHolder> processorHoldersCache;
+    private List<RouteHolder> routeHoldersCache;
 
-    public MBeanRouteStatisticsCollector(CamelContext camelContext, MBeanServer mBeanServer, String statisticsCollectorType) {
+    public MBeanRouteStatisticsCollector(CamelContext camelContext, MBeanServer mBeanServer, String statisticsCollectorType,
+                                         boolean shouldCacheProcessorHolders, boolean shouldCacheRouteHolders) {
         super(camelContext, mBeanServer);
 
         this.statisticsCollectorType = StatisticsCollectorType.fromValue(statisticsCollectorType);
+        this.shouldCacheProcessorHolders = shouldCacheProcessorHolders;
+        this.shouldCacheRouteHolders = shouldCacheRouteHolders;
     }
 
     public List<RouteStatistics> query(List<Processor> processors, Exchange exchange) {
@@ -73,27 +81,33 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
     }
 
     private List<RouteHolder> getRouteNames(Map<String, ProcessorHolder> processorHolders) {
-        List<RouteHolder> holders = new ArrayList<RouteHolder>();
+        if (!shouldCacheRouteHolders || routeHoldersCache == null || routeHoldersCache.size() <= 0) {
+            routeHoldersCache = new ArrayList<RouteHolder>();
 
-        Set<ObjectName> set = queryNames(null, null, StatisticsCollectorType.ALL_ROUTES);
-        Iterator<ObjectName> iterator = set.iterator();
-        while (iterator.hasNext()) {
-            ObjectName foundMBean = iterator.next();
+            Set<ObjectName> set = queryNames(null, null, StatisticsCollectorType.ALL_ROUTES);
+            Iterator<ObjectName> iterator = set.iterator();
+            while (iterator.hasNext()) {
+                ObjectName foundMBean = iterator.next();
 
-            String uri = normalizeUri(getStringAttribute(foundMBean, "EndpointUri"));
-            if (processorHolders.containsKey(uri)) {
-                RouteHolder holder = new RouteHolder();
-                holder.setCamelContextName(getStringAttribute(foundMBean, "CamelId"));
-                holder.setRouteName(getStringAttribute(foundMBean, "RouteId"));
-                holder.setUri(uri);
+                String uri = normalizeUri(getStringAttribute(foundMBean, "EndpointUri"));
+                if (processorHolders.containsKey(uri)) {
+                    RouteHolder holder = new RouteHolder();
+                    holder.setCamelContextName(getStringAttribute(foundMBean, "CamelId"));
+                    holder.setRouteName(getStringAttribute(foundMBean, "RouteId"));
+                    holder.setUri(uri);
 
-                holders.add(holder);
+                    routeHoldersCache.add(holder);
+                }
             }
+
+            if (routeHoldersCache.size() <= 0) {
+                throw new IllegalStateException("Found no route holders based on keys '" + Arrays.toString(processorHolders.keySet().toArray()) + "'");
+            }
+
+            LOG.debug("Found '{}' routes which match the processors", routeHoldersCache.toArray());
         }
 
-        LOG.debug("Found '{}' routes which match the processors", holders.toArray());
-
-        return holders;
+        return routeHoldersCache;
     }
 
     private RouteStatistics query(Map<String, ProcessorHolder> processorHolders, String camelContextName, String name) {
@@ -123,39 +137,45 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
     }
 
     private Map<String, ProcessorHolder> getProcessorHolders(List<Processor> processors, Exchange exchange) {
-        Map<String, ProcessorHolder> answer = new HashMap<String, ProcessorHolder>();
+        if (!shouldCacheProcessorHolders || processorHoldersCache == null || processorHoldersCache.size() <= 0) {
+            processorHoldersCache = new HashMap<String, ProcessorHolder>();
 
-        for (Processor current : processors) {
-            if (current instanceof DefaultChannel) {
-                DefaultChannel currentChannel = (DefaultChannel)current;
+            for (Processor current : processors) {
+                if (current instanceof DefaultChannel) {
+                    DefaultChannel currentChannel = (DefaultChannel)current;
 
-                Object outputValue = null;
-                try {
-                    Field outputField = FieldUtils.getField(DefaultChannel.class, "childDefinition", true);
-                    outputValue = FieldUtils.readField(outputField, currentChannel, true);
-                } catch (IllegalAccessException ex) {
-                    //ignore
-                }
+                    Object outputValue = null;
+                    try {
+                        Field outputField = FieldUtils.getField(DefaultChannel.class, "childDefinition", true);
+                        outputValue = FieldUtils.readField(outputField, currentChannel, true);
+                    } catch (IllegalAccessException ex) {
+                        //ignore
+                    }
 
-                if (outputValue != null && outputValue instanceof ToDefinition) {
-                    ToDefinition to = (ToDefinition)outputValue;
+                    if (outputValue != null && outputValue instanceof ToDefinition) {
+                        ToDefinition to = (ToDefinition)outputValue;
 
-                    String uri = normalizeUri(to.getUri());
+                        String uri = normalizeUri(to.getUri());
 
-                    ProcessorHolder holder = new ProcessorHolder();
-                    holder.setCamelContextName(exchange.getContext().getName());
-                    holder.setRouteName(exchange.getFromRouteId());
-                    holder.setUri(uri);
-                    holder.setProcessor(current);
+                        ProcessorHolder holder = new ProcessorHolder();
+                        holder.setCamelContextName(exchange.getContext().getName());
+                        holder.setRouteName(exchange.getFromRouteId());
+                        holder.setUri(uri);
+                        holder.setProcessor(current);
 
-                    answer.put(uri, holder);
+                        processorHoldersCache.put(uri, holder);
+                    }
                 }
             }
+
+            if (processorHoldersCache.size() <= 0) {
+                throw new IllegalStateException("Found no processor holders based on processors '" + Arrays.toString(processors.toArray()) + "'");
+            }
+
+            LOG.debug("Found '{}' processors'", processorHoldersCache.values().toArray());
         }
 
-        LOG.debug("Found '{}' processors'", answer.values().toArray());
-
-        return answer;
+        return processorHoldersCache;
     }
 
     private String normalizeUri(String uri) {

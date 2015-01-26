@@ -49,6 +49,8 @@
         <argument ref="dynamic-lb-example1-context"/>
         <argument ref="mbeanServer"/>
         <argument value="route"/>
+        <argument value="true"/>
+        <argument value="true"/>
     </bean>
 
     <bean id="dynamicLoadBalancerConfiguration" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicLoadBalancerConfiguration">
