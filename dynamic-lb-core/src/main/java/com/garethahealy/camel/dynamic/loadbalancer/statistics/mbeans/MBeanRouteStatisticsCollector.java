@@ -52,8 +52,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Collects stats on routes or processors used by the load balancer,
  * so that we can select the next processor which a message is sent to
- *
- * @version
  */
 public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
@@ -100,7 +98,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
      * @return
      */
     private List<RouteHolder> getRouteNames(Map<String, ProcessorHolder> processorHolders) {
-        if (!shouldCacheRouteHolders || routeHoldersCache == null || routeHoldersCache.size() <= 0) {
+        if (!shouldCacheRouteHolders || routeHoldersCache == null || routeHoldersCache.isEmpty()) {
             routeHoldersCache = new ArrayList<RouteHolder>();
 
             Set<ObjectName> set = queryNames(null, null, StatisticsCollectorType.ALL_ROUTES);
@@ -119,7 +117,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
                 }
             }
 
-            if (routeHoldersCache.size() <= 0) {
+            if (routeHoldersCache.isEmpty()) {
                 throw new IllegalStateException("Found no route holders based on keys '" + Arrays.toString(processorHolders.keySet().toArray()) + "'");
             }
 
@@ -171,7 +169,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
      * @return
      */
     private Map<String, ProcessorHolder> getProcessorHolders(List<Processor> processors, Exchange exchange) {
-        if (!shouldCacheProcessorHolders || processorHoldersCache == null || processorHoldersCache.size() <= 0) {
+        if (!shouldCacheProcessorHolders || processorHoldersCache == null || processorHoldersCache.isEmpty()) {
             processorHoldersCache = new HashMap<String, ProcessorHolder>();
 
             for (Processor current : processors) {
@@ -186,7 +184,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
                 processorHoldersCache.put(uri, holder);
             }
 
-            if (processorHoldersCache.size() <= 0) {
+            if (processorHoldersCache.isEmpty()) {
                 throw new IllegalStateException("Found no processor holders based on processors '" + Arrays.toString(processors.toArray()) + "'");
             }
 
@@ -198,6 +196,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
     /**
      * Get the uri from the processor (NOTE: Current impl uses reflection, so could fail easily)
+     *
      * @param current
      * @return
      */
@@ -216,7 +215,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
                 Field outputField = FieldUtils.getField(DefaultChannel.class, "childDefinition", true);
                 outputValue = FieldUtils.readField(outputField, currentChannel, true);
             } catch (IllegalAccessException ex) {
-                //ignore
+                LOG.error("Cannot access 'childDefinition' on {} because: {}", current, ExceptionUtils.getStackTrace(ex));
             }
 
             //NOTE: What if the definition isnt a To, its another type...
@@ -232,6 +231,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
     /**
      * Normalize the URI so we can match easily
+     *
      * @param uri
      * @return
      */
@@ -240,9 +240,9 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
         try {
             normalizeUri = URISupport.normalizeUri(uri);
         } catch (URISyntaxException ex) {
-            LOG.error(ExceptionUtils.getStackTrace(ex));
+            LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
         } catch (UnsupportedEncodingException ex) {
-            LOG.error(ExceptionUtils.getStackTrace(ex));
+            LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
         }
 
         return normalizeUri;

@@ -20,7 +20,6 @@
 package com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy;
 
 import java.util.List;
-import java.util.Map;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 
@@ -28,8 +27,6 @@ import org.apache.camel.Processor;
 
 /**
  * Strategy to determine which processor is selected based on stats provided
- *
- * @version
  */
 public interface ProcessorSelectorStrategy {
 

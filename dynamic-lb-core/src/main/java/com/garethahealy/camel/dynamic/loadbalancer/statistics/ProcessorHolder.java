@@ -24,8 +24,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Information about a processor
- *
- * @version
  */
 public class ProcessorHolder {
 

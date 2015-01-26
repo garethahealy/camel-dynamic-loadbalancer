@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Strategy which returns processor based on the mean processing time of the object
- *
- * @version
  */
 public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSelectorStrategy {
 
@@ -60,7 +58,6 @@ public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSel
     public List<Integer> getWeightedProcessors(List<RouteStatistics> stats) {
         Collections.sort(stats, new RouteStatisticsComparator());
 
-        //todo: need to check....
         List<Integer> indexes = new LinkedList<Integer>();
         for (int i = stats.size(); i > stats.size(); i--) {
             indexes.add(i);

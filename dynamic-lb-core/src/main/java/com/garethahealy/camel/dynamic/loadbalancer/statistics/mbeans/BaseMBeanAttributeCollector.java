@@ -40,8 +40,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Base impl for MBean stats collection
- *
- * @version
  */
 public abstract class BaseMBeanAttributeCollector implements RouteStatisticsCollector {
 

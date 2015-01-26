@@ -20,7 +20,6 @@
 package com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy;
 
 import java.util.List;
-import java.util.Set;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 
@@ -29,8 +28,6 @@ import org.apache.camel.Processor;
 
 /**
  * Strategy to determine how stats should be collected
- *
- * @version
  */
 public interface RouteStatisticsCollector {
 

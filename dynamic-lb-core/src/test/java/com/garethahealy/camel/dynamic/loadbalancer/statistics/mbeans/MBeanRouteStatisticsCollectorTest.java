@@ -24,14 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.QueryExp;
-import javax.management.ReflectionException;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
 
@@ -42,7 +37,6 @@ import org.apache.camel.management.DefaultManagementAgent;
 import org.apache.camel.management.DefaultManagementStrategy;
 import org.apache.camel.processor.SendProcessor;
 import org.apache.camel.processor.interceptor.DefaultChannel;
-import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.test.junit4.ExchangeTestSupport;
 import org.junit.Assert;
 import org.junit.Test;

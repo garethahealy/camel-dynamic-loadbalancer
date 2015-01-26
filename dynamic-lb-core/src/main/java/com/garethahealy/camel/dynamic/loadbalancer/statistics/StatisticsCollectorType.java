@@ -21,8 +21,6 @@ package com.garethahealy.camel.dynamic.loadbalancer.statistics;
 
 /**
  * Type of object to collect stats on
- *
- * @version
  */
 public enum StatisticsCollectorType {
 

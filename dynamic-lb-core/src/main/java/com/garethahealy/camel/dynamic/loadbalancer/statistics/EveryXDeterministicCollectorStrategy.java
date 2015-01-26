@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Strategy which returns true to collect once it has been called X amount of times
- *
- * @version
  */
 public class EveryXDeterministicCollectorStrategy implements DeterministicCollectorStrategy {
 

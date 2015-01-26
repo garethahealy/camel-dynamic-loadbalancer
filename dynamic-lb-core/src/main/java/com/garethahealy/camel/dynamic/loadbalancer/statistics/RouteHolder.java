@@ -23,8 +23,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Information about a route
- *
- * @version
  */
 public class RouteHolder {
 

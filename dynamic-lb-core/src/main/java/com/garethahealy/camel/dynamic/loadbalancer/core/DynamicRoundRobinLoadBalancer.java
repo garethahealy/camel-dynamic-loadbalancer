@@ -33,8 +33,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Dynamic load balancer that selects a processor based on metrics, else fallback to default round-robin
- *
- * @version
  */
 public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
 
