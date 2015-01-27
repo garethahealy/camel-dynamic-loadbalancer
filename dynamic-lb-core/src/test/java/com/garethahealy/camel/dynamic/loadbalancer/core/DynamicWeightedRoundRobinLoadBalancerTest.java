@@ -70,6 +70,10 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
         config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
 
         DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
+        for (Processor current : processors) {
+            loadBalancer.addProcessor(current);
+        }
+        
         Processor answer = loadBalancer.chooseProcessor(processors, exchange);
 
         Assert.assertNotNull(answer);
