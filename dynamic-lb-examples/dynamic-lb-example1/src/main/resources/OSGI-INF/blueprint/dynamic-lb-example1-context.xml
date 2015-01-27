@@ -77,7 +77,7 @@
             <from uri="seda:start"/>
             <loadBalance>
                 <custom ref="dynamicWeightedLoadBalancer"/>
-                <to uri="seda:readerOne" id="dynamicWeightedLoadBalancer-readerOne-0"/>
+                <to uri="seda:readerOne"/>
                 <to uri="seda:readerTwo"/>
                 <to uri="seda:readerThree"/>
             </loadBalance>
