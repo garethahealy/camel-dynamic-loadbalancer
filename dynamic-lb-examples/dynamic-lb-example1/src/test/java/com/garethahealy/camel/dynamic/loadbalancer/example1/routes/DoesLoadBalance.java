@@ -19,13 +19,10 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.example1.routes;
 
-import org.apache.camel.Consume;
-import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class DoesLoadBalance extends BaseCamelBlueprintTestSupport {
@@ -41,7 +38,6 @@ public class DoesLoadBalance extends BaseCamelBlueprintTestSupport {
 
     @EndpointInject(uri = "mock:readerThreeEnd")
     private MockEndpoint mock3;
-
 
     @Test
     public void can() throws InterruptedException {

@@ -73,7 +73,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
         for (Processor current : processors) {
             loadBalancer.addProcessor(current);
         }
-        
+
         Processor answer = loadBalancer.chooseProcessor(processors, exchange);
 
         Assert.assertNotNull(answer);
