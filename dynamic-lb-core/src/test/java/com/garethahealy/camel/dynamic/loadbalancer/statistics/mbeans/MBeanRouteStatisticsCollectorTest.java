@@ -35,6 +35,7 @@ import org.apache.camel.component.direct.DirectComponent;
 import org.apache.camel.component.direct.DirectEndpoint;
 import org.apache.camel.management.DefaultManagementAgent;
 import org.apache.camel.management.DefaultManagementStrategy;
+import org.apache.camel.model.ToDefinition;
 import org.apache.camel.processor.SendProcessor;
 import org.apache.camel.processor.interceptor.DefaultChannel;
 import org.apache.camel.test.junit4.ExchangeTestSupport;
@@ -90,10 +91,10 @@ public class MBeanRouteStatisticsCollectorTest extends ExchangeTestSupport {
         component.setCamelContext(context);
 
         DefaultChannel processor1 = new DefaultChannel();
-        processor1.setOutput(new SendProcessor(new DirectEndpoint("direct:lb1", component)));
+        processor1.setChildDefinition(new ToDefinition(new DirectEndpoint("direct:lb1", component)));
 
         DefaultChannel processor2 = new DefaultChannel();
-        processor2.setOutput(new SendProcessor(new DirectEndpoint("direct:lb2", component)));
+        processor2.setChildDefinition(new ToDefinition(new DirectEndpoint("direct:lb2", component)));
 
         List<Processor> processors = new LinkedList<Processor>();
         processors.add(processor1);

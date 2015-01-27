@@ -219,7 +219,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
             Object outputValue = null;
             try {
-                //NOTE: Shouldnt really be using reflection...
+                //NOTE: Shouldnt really be using reflection...but dont know what class i can use
                 Field outputField = FieldUtils.getField(DefaultChannel.class, "childDefinition", true);
                 outputValue = FieldUtils.readField(outputField, currentChannel, true);
             } catch (IllegalAccessException ex) {
