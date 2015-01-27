@@ -121,6 +121,10 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
                 throw new IllegalStateException("Found no route holders based on keys '" + Arrays.toString(processorHolders.keySet().toArray()) + "'");
             }
 
+            if (routeHoldersCache.size() != processorHolders.size()) {
+                throw new IllegalStateException("Route holders '" + routeHoldersCache.size() + "' does not match process holders '" + processorHolders.size() + "'");
+            }
+
             LOG.debug("Found '{}' routes which match the processors", Arrays.toString(routeHoldersCache.toArray()));
         }
 
