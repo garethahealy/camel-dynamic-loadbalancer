@@ -48,14 +48,14 @@
         </route>
 
         <route id="readerTwo">
-            <from uri="seda:readerTwo"/>
+            <from uri="activemq:readerTwo"/>
             <log message="Got ${body} from readerTwo"/>
             <bean ref="sleeper" method="sleep5Second"/>
             <to uri="mock:readerTwoEnd"/>
         </route>
 
         <route id="readerThree">
-            <from uri="seda:readerThree"/>
+            <from uri="activemq:readerThree"/>
             <log message="Got ${body} from readerThree"/>
             <to uri="mock:readerThreeEnd"/>
         </route>
