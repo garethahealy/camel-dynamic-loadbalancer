@@ -121,7 +121,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
                 throw new IllegalStateException("Found no route holders based on keys '" + Arrays.toString(processorHolders.keySet().toArray()) + "'");
             }
 
-            LOG.debug("Found '{}' routes which match the processors", routeHoldersCache.toArray());
+            LOG.debug("Found '{}' routes which match the processors", Arrays.toString(routeHoldersCache.toArray()));
         }
 
         return routeHoldersCache;
@@ -145,17 +145,25 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
             String camelId = getStringAttribute(foundMBean, "CamelId");
             if (camelId != null && camelId.equalsIgnoreCase(camelContextName)) {
-                stats = new RouteStatistics();
-                stats.setProcessorHolder(processorHolders.get(normalizeUri(getStringAttribute(foundMBean, "EndpointUri"))));
-                stats.setInflightExchange(getIntegerAttribute(foundMBean, "InflightExchanges"));
-                stats.setMeanProcessingTime(getLongAttribute(foundMBean, "MeanProcessingTime"));
-                stats.setLastProcessingTime(getLongAttribute(foundMBean, "LastProcessingTime"));
-                stats.setLoad01(getStringAttribute(foundMBean, "Load01"));
-                stats.setLoad05(getStringAttribute(foundMBean, "Load05"));
-                stats.setLoad15(getStringAttribute(foundMBean, "Load15"));
+                String uri = normalizeUri(getStringAttribute(foundMBean, "EndpointUri"));
+                if (processorHolders.containsKey(uri)) {
+                    stats = new RouteStatistics();
+                    stats.setProcessorHolder(processorHolders.get(uri));
+                    stats.setInflightExchange(getIntegerAttribute(foundMBean, "InflightExchanges"));
+                    stats.setMeanProcessingTime(getLongAttribute(foundMBean, "MeanProcessingTime"));
+                    stats.setLastProcessingTime(getLongAttribute(foundMBean, "LastProcessingTime"));
+                    stats.setLoad01(getStringAttribute(foundMBean, "Load01"));
+                    stats.setLoad05(getStringAttribute(foundMBean, "Load05"));
+                    stats.setLoad15(getStringAttribute(foundMBean, "Load15"));
 
-                LOG.debug("Found '{}' stats for '{}' '{}'", stats, camelContextName, name);
+                    LOG.debug("Found '{}' stats for '{}' '{}'", stats, camelContextName, name);
+                }
             }
+        }
+
+        if (stats == null) {
+            throw new IllegalStateException(
+                "Did not find stats for '" + camelContextName + ":" + name + "' for keys '" + Arrays.toString(processorHolders.keySet().toArray()) + "'");
         }
 
         return stats;
@@ -188,7 +196,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
                 throw new IllegalStateException("Found no processor holders based on processors '" + Arrays.toString(processors.toArray()) + "'");
             }
 
-            LOG.debug("Found '{}' processors'", processorHoldersCache.values().toArray());
+            LOG.debug("Found '{}' processors'", Arrays.toString(processorHoldersCache.values().toArray()));
         }
 
         return processorHoldersCache;
@@ -226,6 +234,10 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
             }
         }
 
+        if (uri.isEmpty()) {
+            throw new IllegalStateException("Could not get URI from processor '" + current + "'");
+        }
+
         return uri;
     }
 
@@ -237,12 +249,15 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
      */
     private String normalizeUri(String uri) {
         String normalizeUri = "";
-        try {
-            normalizeUri = URISupport.normalizeUri(uri);
-        } catch (URISyntaxException ex) {
-            LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
-        } catch (UnsupportedEncodingException ex) {
-            LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
+
+        if (uri != null) {
+            try {
+                normalizeUri = URISupport.normalizeUri(uri);
+            } catch (URISyntaxException ex) {
+                LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
+            } catch (UnsupportedEncodingException ex) {
+                LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
+            }
         }
 
         return normalizeUri;
