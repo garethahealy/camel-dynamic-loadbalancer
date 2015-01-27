@@ -54,7 +54,7 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
         DeterministicCollectorStrategy deterministicCollectorStrategy = config.getDeterministicCollectorStrategy();
 
         if (getRuntimeRatios().isEmpty() || getRuntimeRatios().size() != processors.size()) {
-            loadRuntimeRatios(getDefaultRuntimeRatios(processors));
+            updateWeightings(getDefaultRuntimeRatios(processors));
         }
 
         if (deterministicCollectorStrategy.shouldCollect()) {
@@ -64,12 +64,25 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
                 List<Integer> found = selectorStrategy.getWeightedProcessors(stats);
 
-                getRuntimeRatios().clear();
-                loadRuntimeRatios(found);
+                updateWeightings(found);
             }
         }
 
         return super.chooseProcessor(processors, exchange);
+    }
+
+    private void updateWeightings(List<Integer> found) {
+        //Update the weightings list
+        setDistributionRatioList(found);
+
+        //Update the weightings objects used internally by the LB
+        getRuntimeRatios().clear();
+        loadRuntimeRatios(found);
+
+        if (getProcessors().size() != getDistributionRatioList().size()) {
+            throw new IllegalArgumentException("Loadbalacing with " + getProcessors().size()
+                                               + " should match number of distributions " + getDistributionRatioList().size());
+        }
     }
 
     private List<Integer> getDefaultRuntimeRatios(List<Processor> processors) {
