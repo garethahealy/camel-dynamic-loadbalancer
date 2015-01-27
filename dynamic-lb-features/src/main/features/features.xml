@@ -31,7 +31,6 @@
         <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3-version}</bundle>
         <bundle>mvn:commons-io/commons-io/${commons-io-version}</bundle>
         <bundle>mvn:${project.groupId}/dynamic-lb-core/${project.version}</bundle>
-        <bundle>mvn:${project.groupId}/dynamic-lb-example1/${project.version}</bundle>
     </feature>
 
     <feature name="${project.groupId}-dynamic-lb-examples1" version="${project.version}" resolver="(obr)">
