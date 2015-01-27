@@ -20,6 +20,7 @@
 package com.garethahealy.camel.dynamic.loadbalancer.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
@@ -63,6 +64,8 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
             if (stats.size() >= 0) {
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
                 List<Integer> found = selectorStrategy.getWeightedProcessors(stats);
+
+                LOG.debug("About to update weightings to '{}'", Arrays.toString(found.toArray()));
 
                 updateWeightings(found);
             }

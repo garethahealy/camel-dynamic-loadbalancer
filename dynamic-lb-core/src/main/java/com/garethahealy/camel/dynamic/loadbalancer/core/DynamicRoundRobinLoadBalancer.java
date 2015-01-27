@@ -30,11 +30,15 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.processor.loadbalancer.RoundRobinLoadBalancer;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dynamic load balancer that selects a processor based on metrics, else fallback to default round-robin
  */
 public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DynamicRoundRobinLoadBalancer.class);
 
     private DynamicLoadBalancerConfiguration config;
 
@@ -54,6 +58,8 @@ public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
             if (stats.size() >= 0) {
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
                 answer = selectorStrategy.getProcessor(stats);
+
+                LOG.debug("About to update processor to '{}'", answer);
             }
         }
 
