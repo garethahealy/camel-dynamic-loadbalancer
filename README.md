@@ -1,28 +1,38 @@
 camel-dynamic-loadbalancer
 =============================
-Sample code which implements a dynamic load balancer.
+Sample code which implements a dynamic load balancer within camel
 
 Idea
-=====
-- The idea is to use the RoundRobinLoadBalancer, but select the processor based on stats collected on the routes
-- Stats will be collected via MBeans - currently only works in same CamelContext, but could be expanded
-- Stats only collected based on a collection strategy, i.e.: we dont spam MBeans
-- Strategy to define which stat is regarded as the "best", which then returns the processor
+=============================
+- Extend the RoundRobinLoadBalancer, but select the processor based on stats collected
+- Extend the WeightedRoundRobinLoadBalancer, but set the weights based on stats collected
 
-Very much work in progress...
+Provide the following strategies so that the load balancer can be adapted for different needs:
+- DeterministicCollectorStrategy : if the stats should be collected
+- RouteStatisticsCollector : how the stats are collected
+- ProcessorSelectorStrategy : what processor is selected based on the stats
 
-MessageHelper.dumpMessageHistoryStacktrace(exchange, new DefaultExchangeFormatter(), false)
+Implementation of Strategies
+=============================
+- DeterministicCollectorStrategy is implemented by EveryXDeterministicCollectorStrategy
+- RouteStatisticsCollector is implemented by MBeanRouteStatisticsCollector
+- ProcessorSelectorStrategy is implemented by MeanProcessingTimeProcessorSelectorStrategy
 
+Implementation of LBs
+=============================
+1. DynamicRoundRobinLoadBalancer
+2. DynamicWeightedRoundRobinLoadBalancer
 
-limitations
-==========
-stats work on routes, but what if we write to a file or use a cxf endpoint? can the collector work off different things?
+Limitations
+=============================
+1. MBeanRouteStatisticsCollector.getUriFromProcessor - this method uses reflection, needs improving.
+2. If we cant match the Processor -> Route in MBeanRouteStatisticsCollector, we fail fast. But what if its in another bundle/machine that has not started?
+2. We can only get stats on routes on the same machine due to MBeans. Above point would cause a failure
 
-how the link routes/processors -> to stats??
-when we collect the stats, maybe we can get the FROM uri...which means we have the stats for a route, and know the from uri,
-which means we can select the to uri, based on the processor list....?
+TODO
+=============================
+1. More unit tests
+2. More examples, context to context
 
------ or
-we go with the index route...but this is not 100% guarnteed to be ordered, id of thought not anyways
 
 
