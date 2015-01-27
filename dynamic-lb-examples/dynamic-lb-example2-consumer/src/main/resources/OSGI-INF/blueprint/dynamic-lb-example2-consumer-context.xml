@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  camel-activemq-transacted
+  %%
+  Copyright (C) 2013 - 2014 Gareth Healy
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+    <bean id="sleeper" class="com.garethahealy.camel.dynamic.loadbalancer.examples.example2.consumer.Sleeper"/>
+
+    <camelContext id="dynamic-lb-example2-consumer-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
+
+        <route id="readerOne">
+            <from uri="activemq:readerOne"/>
+            <log message="Got ${body} from readerOne"/>
+            <bean ref="sleeper" method="sleep1Second"/>
+            <to uri="mock:readerOneEnd"/>
+        </route>
+
+        <route id="readerTwo">
+            <from uri="seda:readerTwo"/>
+            <log message="Got ${body} from readerTwo"/>
+            <bean ref="sleeper" method="sleep5Second"/>
+            <to uri="mock:readerTwoEnd"/>
+        </route>
+
+        <route id="readerThree">
+            <from uri="seda:readerThree"/>
+            <log message="Got ${body} from readerThree"/>
+            <to uri="mock:readerThreeEnd"/>
+        </route>
+
+    </camelContext>
+</blueprint>

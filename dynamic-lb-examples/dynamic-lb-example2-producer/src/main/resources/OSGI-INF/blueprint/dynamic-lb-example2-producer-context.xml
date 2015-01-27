@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  camel-activemq-transacted
+  %%
+  Copyright (C) 2013 - 2014 Gareth Healy
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+       http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd">
+
+    <cm:property-placeholder persistent-id="com.garethahealy.camel.dynamic.loadbalancer.example1" update-strategy="reload">
+        <cm:default-properties>
+            <cm:property name="collectorstrategy.warmup" value="100"/>
+            <cm:property name="collectorstrategy.everyx" value="1000"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <reference id="mbeanServer" interface="javax.management.MBeanServer" availability="mandatory"/>
+
+    <bean id="meanProcessingTimeProcessorSelectorStrategy" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.MeanProcessingTimeProcessorSelectorStrategy"/>
+
+    <bean id="everyXDeterministicCollectorStrategy" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.EveryXDeterministicCollectorStrategy">
+        <argument value="${collectorstrategy.warmup}"/>
+        <argument value="${collectorstrategy.everyx}"/>
+    </bean>
+
+    <bean id="MBeanRouteStatisticsCollector" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.mbeans.MBeanRouteStatisticsCollector">
+        <argument ref="dynamic-lb-example1-context"/>
+        <argument ref="mbeanServer"/>
+        <argument value="route"/>
+        <argument value="true"/>
+        <argument value="true"/>
+    </bean>
+
+    <bean id="dynamicLoadBalancerConfiguration" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicLoadBalancerConfiguration">
+        <argument ref="meanProcessingTimeProcessorSelectorStrategy"/>
+        <argument ref="everyXDeterministicCollectorStrategy"/>
+        <argument ref="MBeanRouteStatisticsCollector"/>
+    </bean>
+
+    <bean id="dynamicWeightedLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicRoundRobinLoadBalancer">
+        <argument ref="dynamicLoadBalancerConfiguration"/>
+    </bean>
+
+    <camelContext id="dynamic-lb-example2-producer-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
+
+        <route id="spamLoadBalancer">
+            <from uri="timer://spamLoadBalancer?delay=10s&amp;period=100&amp;repeatCount=10000"/>
+            <setBody>
+                <simple>EXAMPLE2: Hello LoadBalancer. I am ${property.CamelTimerCounter}</simple>
+            </setBody>
+            <to uri="seda:start"/>
+        </route>
+
+        <route id="loadBalancerStart">
+            <from uri="seda:start"/>
+            <loadBalance>
+                <custom ref="dynamicWeightedLoadBalancer"/>
+                <to uri="activemq:readerOne"/>
+                <to uri="activemq:readerTwo"/>
+                <to uri="activemq:readerThree"/>
+            </loadBalance>
+        </route>
+
+    </camelContext>
+</blueprint>
