@@ -35,6 +35,16 @@
     </cm:property-placeholder>
 
     <reference id="mbeanServer" interface="javax.management.MBeanServer" availability="mandatory"/>
+    <reference id="amqPooledConnectionFactory" interface="javax.jms.ConnectionFactory"/>
+
+    <bean id="activeMQConfiguration" class="org.apache.activemq.camel.component.ActiveMQConfiguration">
+        <property name="connectionFactory" ref="amqPooledConnectionFactory"/>
+        <property name="concurrentConsumers" value="1"/>
+    </bean>
+
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
+        <property name="configuration" ref="activeMQConfiguration"/>
+    </bean>
 
     <bean id="meanProcessingTimeProcessorSelectorStrategy" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.MeanProcessingTimeProcessorSelectorStrategy"/>
 
@@ -44,7 +54,7 @@
     </bean>
 
     <bean id="MBeanRouteStatisticsCollector" class="com.garethahealy.camel.dynamic.loadbalancer.statistics.mbeans.MBeanRouteStatisticsCollector">
-        <argument ref="dynamic-lb-example1-context"/>
+        <argument ref="dynamic-lb-example2-producer-context"/>
         <argument ref="mbeanServer"/>
         <argument value="route"/>
         <argument value="true"/>

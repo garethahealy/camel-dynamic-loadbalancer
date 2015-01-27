@@ -22,6 +22,7 @@ package com.garethahealy.camel.dynamic.loadbalancer.example2.producer.routes;
 import java.util.Dictionary;
 import java.util.Map;
 
+import javax.jms.ConnectionFactory;
 import javax.management.MBeanServer;
 
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
@@ -33,5 +34,18 @@ public class BaseCamelBlueprintTestSupport extends CamelBlueprintTestSupport {
     @Override
     protected String getBlueprintDescriptor() {
         return "OSGI-INF/blueprint/dynamic-lb-example2-producer-context.xml";
+    }
+
+    @Override
+    protected void addServicesOnStartup(Map<String, KeyValueHolder<Object, Dictionary>> services) {
+        MBeanServer mBeanServer = Mockito.mock(MBeanServer.class);
+        ConnectionFactory amqPooledConnectionFactory = Mockito.mock(ConnectionFactory.class);
+
+        services.put(MBeanServer.class.getCanonicalName(), asService(mBeanServer, null));
+        services.put(ConnectionFactory.class.getCanonicalName(), asService(amqPooledConnectionFactory, null));
+    }
+
+    protected void provideMockMethods(MBeanServer mBeanServer) {
+
     }
 }

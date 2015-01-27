@@ -27,10 +27,21 @@
     <repository>mvn:org.apache.karaf.assemblies.features/enterprise/${karaf-version}/xml/features</repository>
     <repository>mvn:io.fabric8/fabric8-karaf/${fabric8-version}/xml/features</repository>
 
-    <feature name="${project.groupId}-example" version="${project.version}" resolver="(obr)">
+    <feature name="${project.groupId}-dynamic-lb-core" version="${project.version}" resolver="(obr)">
         <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3-version}</bundle>
         <bundle>mvn:commons-io/commons-io/${commons-io-version}</bundle>
         <bundle>mvn:${project.groupId}/dynamic-lb-core/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/dynamic-lb-example1/${project.version}</bundle>
+    </feature>
+
+    <feature name="${project.groupId}-dynamic-lb-examples1" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">${project.groupId}-dynamic-lb-core</feature>
+        <bundle>mvn:${project.groupId}/dynamic-lb-example1/${project.version}</bundle>
+    </feature>
+
+    <feature name="${project.groupId}-dynamic-lb-examples2" version="${project.version}" resolver="(obr)">
+        <feature version="${project.version}">${project.groupId}-dynamic-lb-core</feature>
+        <bundle>mvn:${project.groupId}/dynamic-lb-example2-consumer/${project.version}</bundle>
+        <bundle>mvn:${project.groupId}/dynamic-lb-example2-producer/${project.version}</bundle>
     </feature>
 </features>

@@ -25,7 +25,18 @@
        http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
        http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
 
+    <reference id="amqPooledConnectionFactory" interface="javax.jms.ConnectionFactory"/>
+
     <bean id="sleeper" class="com.garethahealy.camel.dynamic.loadbalancer.examples.example2.consumer.Sleeper"/>
+
+    <bean id="activeMQConfiguration" class="org.apache.activemq.camel.component.ActiveMQConfiguration">
+        <property name="connectionFactory" ref="amqPooledConnectionFactory"/>
+        <property name="concurrentConsumers" value="1"/>
+    </bean>
+
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
+        <property name="configuration" ref="activeMQConfiguration"/>
+    </bean>
 
     <camelContext id="dynamic-lb-example2-consumer-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
 
