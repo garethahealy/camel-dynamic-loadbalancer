@@ -66,7 +66,7 @@
     <camelContext id="dynamic-lb-example1-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
 
         <route id="spamLoadBalancer">
-            <from uri="timer://spamLoadBalancer?delay=10s&amp;period=100"/>
+            <from uri="timer://spamLoadBalancer?delay=10s&amp;period=100&amps;repeatCount=10000"/>
             <setBody>
                 <simple>Hello LoadBalancer. I am ${property.CamelTimerCounter}</simple>
             </setBody>
