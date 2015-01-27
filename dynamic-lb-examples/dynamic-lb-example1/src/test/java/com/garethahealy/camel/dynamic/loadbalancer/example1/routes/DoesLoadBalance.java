@@ -19,8 +19,12 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.example1.routes;
 
+import org.apache.camel.Consume;
+import org.apache.camel.ConsumerTemplate;
+import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,10 +33,33 @@ public class DoesLoadBalance extends BaseCamelBlueprintTestSupport {
     @Produce(uri = "direct:start")
     private ProducerTemplate startProducerTemplate;
 
-    @Test
-    public void can() {
-        startProducerTemplate.sendBody("message1");
+    @EndpointInject(uri = "mock:readerOneEnd")
+    private MockEndpoint mock1;
 
-        Assert.assertTrue(true);
+    @EndpointInject(uri = "mock:readerTwoEnd")
+    private MockEndpoint mock2;
+
+    @EndpointInject(uri = "mock:readerThreeEnd")
+    private MockEndpoint mock3;
+
+
+    @Test
+    public void can() throws InterruptedException {
+        mock1.expectedMessageCount(1);
+        mock1.expectedBodiesReceived("Got message1 from readerOne");
+
+        mock2.expectedMessageCount(1);
+        mock2.expectedBodiesReceived("Got message2 from readerTwo");
+
+        mock3.expectedMessageCount(1);
+        mock3.expectedBodiesReceived("Got message3 from readerThree");
+
+        startProducerTemplate.sendBody("message1");
+        startProducerTemplate.sendBody("message2");
+        startProducerTemplate.sendBody("message3");
+
+        mock1.assertIsSatisfied();
+        mock2.assertIsSatisfied();
+        mock3.assertIsSatisfied();
     }
 }
