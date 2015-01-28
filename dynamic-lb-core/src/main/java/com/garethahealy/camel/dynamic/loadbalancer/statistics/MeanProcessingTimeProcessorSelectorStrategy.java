@@ -20,10 +20,12 @@
 package com.garethahealy.camel.dynamic.loadbalancer.statistics;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.ProcessorSelectorStrategy;
 
@@ -55,25 +57,26 @@ public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSel
     }
 
     @Override
-    public List<Integer> getWeightedProcessors(List<RouteStatistics> stats) {
-        //TODO: this sorts by stats, but the weights returned do not match the processor order...
-        //i.e.:
-        // process1
-        // process2
-        // process3
-
-        //but weights are returned just as a list...so the best weighting, might not be the best processor
-
+    public List<Integer> getWeightedProcessors(List<RouteStatistics> stats, List<Processor> processors) {
         Collections.sort(stats, new RouteStatisticsComparator());
 
-        List<Integer> indexes = new LinkedList<Integer>();
-        for (int i = stats.size(); i > 0; i--) {
-            indexes.add(i);
+        Map<Processor, Integer> answer = new HashMap<Processor, Integer>();
+        int i = stats.size();
+        for (RouteStatistics current : stats) {
+            answer.put(current.getProcessorHolder().getProcessor(), i);
+
+            i--;
         }
 
-        LOG.debug("Found '{}' for weights on the processors", indexes.toArray());
+        List<Integer> weighting = new ArrayList<Integer>();
+        for (Processor current : processors) {
+            Integer weight = answer.get(current);
+            weighting.add(weight);
 
-        return indexes;
+            LOG.debug("Found '{}' for weighting '{}'", current, weight);
+        }
+
+        return weighting;
     }
 
     private static class RouteStatisticsComparator implements Comparator<RouteStatistics>, Serializable {
