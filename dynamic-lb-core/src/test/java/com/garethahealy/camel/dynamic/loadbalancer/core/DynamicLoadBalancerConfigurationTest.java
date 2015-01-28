@@ -27,7 +27,6 @@ import com.garethahealy.camel.dynamic.loadbalancer.statistics.mbeans.MBeanRouteS
 
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.Assert;
-
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -47,10 +46,10 @@ public class DynamicLoadBalancerConfigurationTest {
 
     @Test
     public void canUseConstructor() {
-        DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
-        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(1, 1));
-        config.setRouteStatisticsCollector(new MBeanRouteStatisticsCollector(new DefaultCamelContext(), Mockito.mock(MBeanServer.class), "route", false, false));
-        config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
+        DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration(new MeanProcessingTimeProcessorSelectorStrategy(),
+                                                                                       new EveryXDeterministicCollectorStrategy(1, 1),
+                                                                                       new MBeanRouteStatisticsCollector(new DefaultCamelContext(), Mockito.mock(MBeanServer.class),
+                                                                                                                         "route", false, false));
 
         Assert.assertNotNull(config.getDeterministicCollectorStrategy());
         Assert.assertNotNull(config.getRouteStatisticsCollector());
