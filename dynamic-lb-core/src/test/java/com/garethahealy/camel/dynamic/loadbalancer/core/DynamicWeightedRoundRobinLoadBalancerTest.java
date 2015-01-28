@@ -39,7 +39,7 @@ import org.mockito.Mockito;
 public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSupport {
 
     @Test
-    public void handlesTwoProcessors() {
+    public void handlesTwoProcessors() throws Exception {
         ProcessorHolder processorHolder1 = new ProcessorHolder();
         processorHolder1.setProcessor(Mockito.mock(Processor.class));
 
@@ -75,6 +75,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
             loadBalancer.addProcessor(current);
         }
 
+        loadBalancer.doStart();
         Processor answer = loadBalancer.chooseProcessor(processors, exchange);
 
         Assert.assertNotNull(answer);
@@ -82,7 +83,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
     }
 
     @Test
-    public void handlesEmptyStatsReturned() {
+    public void handlesEmptyStatsReturned() throws Exception {
         List<Processor> processors = new LinkedList<Processor>();
         processors.add(Mockito.mock(Processor.class));
         processors.add(Mockito.mock(Processor.class));
@@ -100,6 +101,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
             loadBalancer.addProcessor(current);
         }
 
+        loadBalancer.doStart();
         Processor answer = loadBalancer.chooseProcessor(processors, exchange);
 
         Assert.assertNotNull(answer);
@@ -107,7 +109,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
     }
 
     @Test
-    public void handlesEmptyWeightsReturned() {
+    public void handlesEmptyWeightsReturned() throws Exception {
         List<Processor> processors = new LinkedList<Processor>();
         processors.add(Mockito.mock(Processor.class));
         processors.add(Mockito.mock(Processor.class));
@@ -131,6 +133,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
             loadBalancer.addProcessor(current);
         }
 
+        loadBalancer.doStart();
         Processor answer = loadBalancer.chooseProcessor(processors, exchange);
 
         Assert.assertNotNull(answer);
@@ -138,7 +141,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
     }
 
     @Test
-    public void usesDefaultWeighted() {
+    public void usesDefaultWeighted() throws Exception {
         List<Processor> processors = new LinkedList<Processor>();
         processors.add(Mockito.mock(Processor.class));
         processors.add(Mockito.mock(Processor.class));
@@ -153,33 +156,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
             loadBalancer.addProcessor(current);
         }
 
-        Processor answer = loadBalancer.chooseProcessor(processors, exchange);
-
-        Assert.assertNotNull(answer);
-        Assert.assertEquals(processors.get(0), answer);
-    }
-
-    @Test
-    public void handlesProcessorAndDistributionRatioListMismatch() {
-        List<Processor> processors = new LinkedList<Processor>();
-        processors.add(Mockito.mock(Processor.class));
-        processors.add(Mockito.mock(Processor.class));
-
-        DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
-        config.setRouteStatisticsCollector(Mockito.mock(RouteStatisticsCollector.class));
-        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(10, 10));
-        config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
-
-        List<Integer> distributionRatioList = new ArrayList<Integer>();
-        distributionRatioList.add(1);
-
-        DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
-        loadBalancer.setDistributionRatioList(distributionRatioList);
-
-        for (Processor current : processors) {
-            loadBalancer.addProcessor(current);
-        }
-
+        loadBalancer.doStart();
         Processor answer = loadBalancer.chooseProcessor(processors, exchange);
 
         Assert.assertNotNull(answer);

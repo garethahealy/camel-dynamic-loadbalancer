@@ -51,12 +51,15 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
     }
 
     @Override
+    protected void doStart() throws Exception {
+        updateWeightings(getDefaultRuntimeRatios(getProcessors()));
+
+        super.doStart();
+    }
+
+    @Override
     protected synchronized Processor chooseProcessor(List<Processor> processors, Exchange exchange) {
         DeterministicCollectorStrategy deterministicCollectorStrategy = config.getDeterministicCollectorStrategy();
-
-        if (getRuntimeRatios().isEmpty() || getRuntimeRatios().size() != processors.size()) {
-            updateWeightings(getDefaultRuntimeRatios(processors));
-        }
 
         if (deterministicCollectorStrategy.shouldCollect()) {
             RouteStatisticsCollector routeStatisticsCollector = config.getRouteStatisticsCollector();
