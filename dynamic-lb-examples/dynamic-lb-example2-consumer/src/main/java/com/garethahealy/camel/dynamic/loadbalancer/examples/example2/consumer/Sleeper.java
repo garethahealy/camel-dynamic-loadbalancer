@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 public class Sleeper {
 
+    //TODO: add a random sleeper, so the dynamic can change as 'performance' changes
+    
     public void sleep1Second() {
         try {
             TimeUnit.SECONDS.sleep(1);
