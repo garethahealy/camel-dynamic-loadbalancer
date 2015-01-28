@@ -79,7 +79,8 @@ public class MBeanRouteStatisticsCollectorTest extends ExchangeTestSupport {
         setupManagementStrategy();
 
         Set<ObjectName> objectNames = new HashSet<ObjectName>();
-        objectNames.add(new ObjectName(""));
+        objectNames.add(new ObjectName("org.apache.camel:type=routes,name=route1,*"));
+        objectNames.add(new ObjectName("org.apache.camel:type=routes,name=route2,*"));
 
         MBeanServer mBeanServerMocked = Mockito.mock(MBeanServer.class);
         provideRouteStats(mBeanServerMocked, objectNames);
@@ -104,7 +105,7 @@ public class MBeanRouteStatisticsCollectorTest extends ExchangeTestSupport {
         List<RouteStatistics> stats = collector.query(processors, createExchange());
 
         Assert.assertNotNull(stats);
-        Assert.assertEquals(1, stats.size());
+        Assert.assertEquals(2, stats.size());
 
         RouteStatistics first = stats.get(0);
         Assert.assertEquals(new Long(1), new Long(first.getInflightExchange()));
