@@ -19,23 +19,16 @@
  */
 package com.garethahealy.camel.dynamic.loadbalancer.examples.example2.consumer;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Sleeper {
 
-    //TODO: add a random sleeper, so the dynamic can change as 'performance' changes
+    private Random random = new Random();
 
-    public void sleep1Second() {
+    public void sleepRandomSecond() {
         try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException ex) {
-            //ignore
-        }
-    }
-
-    public void sleep5Second() {
-        try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(random.nextInt(5));
         } catch (InterruptedException ex) {
             //ignore
         }
