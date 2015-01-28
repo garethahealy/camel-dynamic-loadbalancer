@@ -121,7 +121,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
         Mockito.when(routeStatisticsCollectorMocked.query(processors, createExchange())).thenReturn(stats);
 
         ProcessorSelectorStrategy processorSelectorStrategyMocked = Mockito.mock(ProcessorSelectorStrategy.class);
-        Mockito.when(processorSelectorStrategyMocked.getWeightedProcessors(stats)).thenReturn(new ArrayList<Integer>());
+        Mockito.when(processorSelectorStrategyMocked.getWeightedProcessors(stats, processors)).thenReturn(new ArrayList<Integer>());
 
         DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
         config.setRouteStatisticsCollector(routeStatisticsCollectorMocked);

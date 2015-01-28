@@ -66,7 +66,7 @@ public class DynamicWeightedRoundRobinLoadBalancer extends WeightedRoundRobinLoa
             List<RouteStatistics> stats = routeStatisticsCollector.query(processors, exchange);
             if (stats.size() > 0) {
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
-                List<Integer> found = selectorStrategy.getWeightedProcessors(stats);
+                List<Integer> found = selectorStrategy.getWeightedProcessors(stats, processors);
                 if (found.size() > 0) {
                     LOG.debug("About to update weightings to '{}'", Arrays.toString(found.toArray()));
 

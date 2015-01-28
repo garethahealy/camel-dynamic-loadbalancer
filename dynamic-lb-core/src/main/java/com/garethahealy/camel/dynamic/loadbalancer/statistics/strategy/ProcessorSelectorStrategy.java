@@ -32,5 +32,5 @@ public interface ProcessorSelectorStrategy {
 
     Processor getProcessor(List<RouteStatistics> stats);
 
-    List<Integer> getWeightedProcessors(List<RouteStatistics> stats);
+    List<Integer> getWeightedProcessors(List<RouteStatistics> stats, List<Processor> processors);
 }
