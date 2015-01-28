@@ -56,6 +56,7 @@ public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSel
 
     @Override
     public List<Integer> getWeightedProcessors(List<RouteStatistics> stats) {
+        //TODO: this sorts by stats, but the weights returned dont match the processor order...
         Collections.sort(stats, new RouteStatisticsComparator());
 
         List<Integer> indexes = new LinkedList<Integer>();
