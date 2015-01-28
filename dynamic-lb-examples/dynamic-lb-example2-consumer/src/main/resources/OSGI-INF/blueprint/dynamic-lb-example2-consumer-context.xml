@@ -40,23 +40,43 @@
 
     <camelContext id="dynamic-lb-example2-consumer-context" trace="false" xmlns="http://camel.apache.org/schema/blueprint">
 
-        <route id="readerOne">
-            <from uri="activemq:readerOne"/>
-            <log message="Got ${body} from readerOne"/>
+        <route id="readerDynamicOne">
+            <from uri="activemq:readerDynamicOne"/>
+            <log message="Got ${body} from readerDynamicOne"/>
             <bean ref="sleeper" method="sleep1Second"/>
             <to uri="mock:readerOneEnd"/>
         </route>
 
-        <route id="readerTwo">
-            <from uri="activemq:readerTwo"/>
-            <log message="Got ${body} from readerTwo"/>
+        <route id="readerDynamicTwo">
+            <from uri="activemq:readerDynamicTwo"/>
+            <log message="Got ${body} from readerDynamicTwo"/>
             <bean ref="sleeper" method="sleep5Second"/>
             <to uri="mock:readerTwoEnd"/>
         </route>
 
-        <route id="readerThree">
-            <from uri="activemq:readerThree"/>
-            <log message="Got ${body} from readerThree"/>
+        <route id="readerDynamicThree">
+            <from uri="activemq:readerDynamicThree"/>
+            <log message="Got ${body} from readerDynamicThree"/>
+            <to uri="mock:readerThreeEnd"/>
+        </route>
+
+        <route id="readerRoundRobinOne">
+            <from uri="activemq:readerRoundRobinOne"/>
+            <log message="Got ${body} from readerRoundRobinOne"/>
+            <bean ref="sleeper" method="sleep1Second"/>
+            <to uri="mock:readerOneEnd"/>
+        </route>
+
+        <route id="readerRoundRobinTwo">
+            <from uri="activemq:readerRoundRobinTwo"/>
+            <log message="Got ${body} from readerRoundRobinTwo"/>
+            <bean ref="sleeper" method="sleep5Second"/>
+            <to uri="mock:readerTwoEnd"/>
+        </route>
+
+        <route id="readerRoundRobinThree">
+            <from uri="activemq:readerRoundRobinThree"/>
+            <log message="Got ${body} from readerRoundRobinThree"/>
             <to uri="mock:readerThreeEnd"/>
         </route>
 

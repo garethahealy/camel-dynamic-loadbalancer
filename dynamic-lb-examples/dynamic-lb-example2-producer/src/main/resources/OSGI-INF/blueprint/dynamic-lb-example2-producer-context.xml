@@ -30,7 +30,7 @@
     <cm:property-placeholder persistent-id="com.garethahealy.camel.dynamic.loadbalancer.example1" update-strategy="reload">
         <cm:default-properties>
             <cm:property name="collectorstrategy.warmup" value="100"/>
-            <cm:property name="collectorstrategy.everyx" value="1000"/>
+            <cm:property name="collectorstrategy.everyx" value="100"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -67,7 +67,11 @@
         <argument ref="MBeanRouteStatisticsCollector"/>
     </bean>
 
-    <bean id="dynamicWeightedLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicRoundRobinLoadBalancer">
+    <bean id="dynamicRoundRobinLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicRoundRobinLoadBalancer">
+        <argument ref="dynamicLoadBalancerConfiguration"/>
+    </bean>
+
+    <bean id="dynamicWeightedRoundRobinLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicWeightedRoundRobinLoadBalancer">
         <argument ref="dynamicLoadBalancerConfiguration"/>
     </bean>
 
@@ -78,16 +82,28 @@
             <setBody>
                 <simple>EXAMPLE2: Hello LoadBalancer. I am ${property.CamelTimerCounter}</simple>
             </setBody>
-            <to uri="seda:start"/>
+            <to uri="seda:startDynamic"/>
+            <to uri="seda:startRoundRobin"/>
         </route>
 
-        <route id="loadBalancerStart">
-            <from uri="seda:start"/>
+        <route id="loadBalancerDynamicStart">
+            <from uri="seda:startDynamic"/>
             <loadBalance>
-                <custom ref="dynamicWeightedLoadBalancer"/>
-                <to uri="activemq:readerOne"/>
-                <to uri="activemq:readerTwo"/>
-                <to uri="activemq:readerThree"/>
+                <!--<custom ref="dynamicRoundRobinLoadBalancer"/>-->
+                <custom ref="dynamicWeightedRoundRobinLoadBalancer"/>
+                <to uri="activemq:readerDynamicOne"/>
+                <to uri="activemq:readerDynamicTwo"/>
+                <to uri="activemq:readerDynamicThree"/>
+            </loadBalance>
+        </route>
+
+        <route id="loadBalancerRoundRobinStart">
+            <from uri="seda:startRoundRobin"/>
+            <loadBalance>
+                <roundRobin/>
+                <to uri="activemq:readerRoundRobinOne"/>
+                <to uri="activemq:readerRoundRobinTwo"/>
+                <to uri="activemq:readerRoundRobinThree"/>
             </loadBalance>
         </route>
 

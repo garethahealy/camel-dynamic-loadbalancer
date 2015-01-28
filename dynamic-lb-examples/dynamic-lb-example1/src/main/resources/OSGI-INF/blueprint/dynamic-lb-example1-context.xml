@@ -59,7 +59,11 @@
         <argument ref="MBeanRouteStatisticsCollector"/>
     </bean>
 
-    <bean id="dynamicWeightedLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicRoundRobinLoadBalancer">
+    <bean id="dynamicRoundRobinLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicRoundRobinLoadBalancer">
+        <argument ref="dynamicLoadBalancerConfiguration"/>
+    </bean>
+
+    <bean id="dynamicWeightedRoundRobinLoadBalancer" class="com.garethahealy.camel.dynamic.loadbalancer.core.DynamicWeightedRoundRobinLoadBalancer">
         <argument ref="dynamicLoadBalancerConfiguration"/>
     </bean>
 
@@ -76,7 +80,8 @@
         <route id="loadBalancerStart">
             <from uri="seda:start"/>
             <loadBalance>
-                <custom ref="dynamicWeightedLoadBalancer"/>
+                <!-- <custom ref="dynamicRoundRobinLoadBalancer"/> -->
+                <custom ref="dynamicWeightedRoundRobinLoadBalancer"/>
                 <to uri="seda:readerOne"/>
                 <to uri="seda:readerTwo"/>
                 <to uri="seda:readerThree"/>
