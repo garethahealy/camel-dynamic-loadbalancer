@@ -55,7 +55,7 @@ public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
         if (deterministicCollectorStrategy.shouldCollect()) {
             RouteStatisticsCollector routeStatisticsCollector = config.getRouteStatisticsCollector();
             List<RouteStatistics> stats = routeStatisticsCollector.query(processors, exchange);
-            if (stats.size() >= 0) {
+            if (stats.size() > 0) {
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
                 answer = selectorStrategy.getProcessor(stats);
 
