@@ -59,7 +59,7 @@ public class MeanProcessingTimeProcessorSelectorStrategy implements ProcessorSel
         Collections.sort(stats, new RouteStatisticsComparator());
 
         List<Integer> indexes = new LinkedList<Integer>();
-        for (int i = stats.size(); i > stats.size(); i--) {
+        for (int i = stats.size(); i > 0; i--) {
             indexes.add(i);
         }
 
