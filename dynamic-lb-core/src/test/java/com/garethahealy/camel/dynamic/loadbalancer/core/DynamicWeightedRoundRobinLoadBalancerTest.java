@@ -27,6 +27,7 @@ import com.garethahealy.camel.dynamic.loadbalancer.statistics.EveryXDeterministi
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.MeanProcessingTimeProcessorSelectorStrategy;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.ProcessorHolder;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.RouteStatistics;
+import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.ProcessorSelectorStrategy;
 import com.garethahealy.camel.dynamic.loadbalancer.statistics.strategy.RouteStatisticsCollector;
 
 import org.apache.camel.Processor;
@@ -66,7 +67,7 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
 
         DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
         config.setRouteStatisticsCollector(routeStatisticsCollectorMocked);
-        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(1, 10));
+        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(0, 0));
         config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
 
         DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
@@ -78,5 +79,119 @@ public class DynamicWeightedRoundRobinLoadBalancerTest extends ExchangeTestSuppo
 
         Assert.assertNotNull(answer);
         Assert.assertEquals(processorHolder1.getProcessor(), answer);
+    }
+
+    @Test
+    public void handlesEmptyStatsReturned() {
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(Mockito.mock(Processor.class));
+        processors.add(Mockito.mock(Processor.class));
+
+        RouteStatisticsCollector routeStatisticsCollectorMocked = Mockito.mock(RouteStatisticsCollector.class);
+        Mockito.when(routeStatisticsCollectorMocked.query(processors, createExchange())).thenReturn(new ArrayList<RouteStatistics>());
+
+        DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
+        config.setRouteStatisticsCollector(routeStatisticsCollectorMocked);
+        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(0, 0));
+        config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
+
+        DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
+        for (Processor current : processors) {
+            loadBalancer.addProcessor(current);
+        }
+
+        Processor answer = loadBalancer.chooseProcessor(processors, exchange);
+
+        Assert.assertNotNull(answer);
+        Assert.assertEquals(processors.get(0), answer);
+    }
+
+    @Test
+    public void handlesEmptyWeightsReturned() {
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(Mockito.mock(Processor.class));
+        processors.add(Mockito.mock(Processor.class));
+
+        List<RouteStatistics> stats = new ArrayList<RouteStatistics>();
+        stats.add(new RouteStatistics());
+
+        RouteStatisticsCollector routeStatisticsCollectorMocked = Mockito.mock(RouteStatisticsCollector.class);
+        Mockito.when(routeStatisticsCollectorMocked.query(processors, createExchange())).thenReturn(stats);
+
+        ProcessorSelectorStrategy processorSelectorStrategyMocked = Mockito.mock(ProcessorSelectorStrategy.class);
+        Mockito.when(processorSelectorStrategyMocked.getWeightedProcessors(stats)).thenReturn(new ArrayList<Integer>());
+
+        DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
+        config.setRouteStatisticsCollector(routeStatisticsCollectorMocked);
+        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(0, 0));
+        config.setRouteStatsSelectorStrategy(processorSelectorStrategyMocked);
+
+        DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
+        for (Processor current : processors) {
+            loadBalancer.addProcessor(current);
+        }
+
+        Processor answer = loadBalancer.chooseProcessor(processors, exchange);
+
+        Assert.assertNotNull(answer);
+        Assert.assertEquals(processors.get(0), answer);
+    }
+
+    @Test
+    public void usesDefaultWeighted() {
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(Mockito.mock(Processor.class));
+        processors.add(Mockito.mock(Processor.class));
+
+        DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
+        config.setRouteStatisticsCollector(Mockito.mock(RouteStatisticsCollector.class));
+        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(10, 10));
+        config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
+
+        DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
+        for (Processor current : processors) {
+            loadBalancer.addProcessor(current);
+        }
+
+        Processor answer = loadBalancer.chooseProcessor(processors, exchange);
+
+        Assert.assertNotNull(answer);
+        Assert.assertEquals(processors.get(0), answer);
+    }
+
+    @Test
+    public void handlesProcessorAndDistributionRatioListMismatch() {
+        List<Processor> processors = new LinkedList<Processor>();
+        processors.add(Mockito.mock(Processor.class));
+        processors.add(Mockito.mock(Processor.class));
+
+        DynamicLoadBalancerConfiguration config = new DynamicLoadBalancerConfiguration();
+        config.setRouteStatisticsCollector(Mockito.mock(RouteStatisticsCollector.class));
+        config.setDeterministicCollectorStrategy(new EveryXDeterministicCollectorStrategy(10, 10));
+        config.setRouteStatsSelectorStrategy(new MeanProcessingTimeProcessorSelectorStrategy());
+
+        List<Integer> distributionRatioList = new ArrayList<Integer>();
+        distributionRatioList.add(1);
+
+        DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(config);
+        loadBalancer.setDistributionRatioList(distributionRatioList);
+
+        for (Processor current : processors) {
+            loadBalancer.addProcessor(current);
+        }
+
+        Processor answer = loadBalancer.chooseProcessor(processors, exchange);
+
+        Assert.assertNotNull(answer);
+        Assert.assertEquals(processors.get(0), answer);
+    }
+
+    @Test
+    public void canUseToString() {
+        DynamicWeightedRoundRobinLoadBalancer loadBalancer = new DynamicWeightedRoundRobinLoadBalancer(new DynamicLoadBalancerConfiguration());
+        String answer = loadBalancer.toString();
+
+        Assert.assertNotNull(answer);
+        Assert.assertTrue(answer.contains("config"));
     }
 }
