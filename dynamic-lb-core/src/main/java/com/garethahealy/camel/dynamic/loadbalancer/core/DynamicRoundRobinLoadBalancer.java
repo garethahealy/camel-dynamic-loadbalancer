@@ -59,7 +59,7 @@ public class DynamicRoundRobinLoadBalancer extends RoundRobinLoadBalancer {
                 ProcessorSelectorStrategy selectorStrategy = config.getRouteStatsSelectorStrategy();
                 answer = selectorStrategy.getProcessor(stats);
 
-                LOG.debug("About to update processor to '{}'", answer);
+                LOG.info("About to update processor to '{}'", answer);
             }
         }
 
