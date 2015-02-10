@@ -85,6 +85,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
 
         List<RouteStatistics> stats = new ArrayList<RouteStatistics>();
         for (RouteHolder current : routeHolders) {
+            //NOTE: Do we need to do the below...getRouteNames using MBeans already for these routes...we are querying twice...?
             stats.add(query(processorHolders, current.getCamelContextName(), current.getRouteName()));
         }
 
