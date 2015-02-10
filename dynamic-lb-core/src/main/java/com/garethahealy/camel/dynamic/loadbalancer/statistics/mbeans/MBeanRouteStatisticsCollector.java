@@ -258,9 +258,9 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
             try {
                 normalizeUri = URISupport.normalizeUri(uri);
             } catch (URISyntaxException ex) {
-                LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
+                LOG.error("Tried to normalize uri {}, but went wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
             } catch (UnsupportedEncodingException ex) {
-                LOG.error("Tried to normalize uri {}, but when wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
+                LOG.error("Tried to normalize uri {}, but went wrong: {}", uri, ExceptionUtils.getStackTrace(ex));
             }
         }
 
