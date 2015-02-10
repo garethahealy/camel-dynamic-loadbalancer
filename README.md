@@ -29,10 +29,5 @@ Limitations
 2. If we cant match the Processor -> Route in MBeanRouteStatisticsCollector, we fail fast. But what if its in another bundle/machine that has not started?
 2. We can only get stats on routes on the same machine due to MBeans. Above point would cause a failure
 
-TODO
-=============================
-1. More unit tests
-2. More examples, context to context
-
 
 
