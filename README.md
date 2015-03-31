@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/garethahealy/camel-dynamic-loadbalancer.svg?branch=master)](https://travis-ci.org/garethahealy/camel-dynamic-loadbalancer)
+
 camel-dynamic-loadbalancer
 =============================
 Sample code which implements a dynamic load balancer within camel
