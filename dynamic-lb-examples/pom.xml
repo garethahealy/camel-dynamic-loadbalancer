@@ -11,7 +11,7 @@
     </parent>
     <artifactId>dynamic-lb-examples</artifactId>
     <packaging>pom</packaging>
-    <name>${project.artifactId}</name>
+    <name>GarethHealy :: Camel Dynamic LoadBalance :: Examples</name>
 
     <modules>
         <module>dynamic-lb-example1</module>

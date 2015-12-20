@@ -11,7 +11,7 @@
     </parent>
     <artifactId>dynamic-lb-core</artifactId>
     <packaging>bundle</packaging>
-    <name>${project.artifactId}</name>
+    <name>GarethHealy :: Camel Dynamic LoadBalance :: Core</name>
 
     <properties>
         <build.osgi.import.before.defaults>

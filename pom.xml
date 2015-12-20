@@ -6,14 +6,14 @@
     <parent>
         <groupId>com.garethahealy</groupId>
         <artifactId>camel-parent</artifactId>
-        <version>1.0.6</version>
-        <relativePath>../poms/camel-parent</relativePath>
+        <version>1.0.7-SNAPSHOT</version>
+        <relativePath/>
     </parent>
     <groupId>com.garethahealy.camel</groupId>
     <artifactId>camel-dynamic-loadbalancer-parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
-    <name>${project.artifactId}</name>
+    <name>GarethHealy :: Camel Dynamic LoadBalancer</name>
 
     <scm>
         <connection>scm:git:https://github.com/garethahealy/camel-dynamic-loadbalancer/tree/master</connection>

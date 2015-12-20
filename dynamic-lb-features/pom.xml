@@ -11,7 +11,7 @@
     </parent>
     <artifactId>dynamic-lb-features</artifactId>
     <packaging>jar</packaging>
-    <name>${project.artifactId}</name>
+    <name>GarethHealy :: Camel Dynamic LoadBalance :: Features</name>
 
     <build>
         <defaultGoal>install</defaultGoal>

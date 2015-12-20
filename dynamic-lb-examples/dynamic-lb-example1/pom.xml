@@ -11,7 +11,7 @@
     </parent>
     <artifactId>dynamic-lb-example1</artifactId>
     <packaging>bundle</packaging>
-    <name>${project.artifactId}</name>
+    <name>GarethHealy :: Camel Dynamic LoadBalance :: Example1</name>
 
     <properties>
         <build.osgi.import.before.defaults>
