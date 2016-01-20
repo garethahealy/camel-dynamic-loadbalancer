@@ -1,6 +1,6 @@
 /*
  * #%L
- * dynamic-lb-example1
+ * GarethHealy :: Camel Dynamic LoadBalance :: Example1
  * %%
  * Copyright (C) 2013 - 2015 Gareth Healy
  * %%

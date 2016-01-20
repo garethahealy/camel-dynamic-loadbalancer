@@ -1,6 +1,6 @@
 /*
  * #%L
- * camel-activemq-transacted
+ * GarethHealy :: Camel Dynamic LoadBalance :: Example1
  * %%
  * Copyright (C) 2013 - 2014 Gareth Healy
  * %%

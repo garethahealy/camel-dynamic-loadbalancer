@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.garethahealy.camel</groupId>
         <artifactId>camel-dynamic-loadbalancer-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
         <relativePath>../</relativePath>
     </parent>
     <artifactId>dynamic-lb-features</artifactId>

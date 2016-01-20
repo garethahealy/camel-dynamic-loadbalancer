@@ -1,6 +1,6 @@
 /*
  * #%L
- * dynamic-lb-core
+ * GarethHealy :: Camel Dynamic LoadBalance :: Core
  * %%
  * Copyright (C) 2013 - 2015 Gareth Healy
  * %%

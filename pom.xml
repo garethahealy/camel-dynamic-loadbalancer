@@ -4,15 +4,15 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.garethahealy</groupId>
-        <artifactId>camel-parent</artifactId>
-        <version>1.1.0</version>
+        <groupId>com.garethahealy.poms</groupId>
+        <artifactId>jboss-fuse-parent</artifactId>
+        <version>1.0.0</version>
         <relativePath/>
     </parent>
     <groupId>com.garethahealy.camel</groupId>
     <artifactId>camel-dynamic-loadbalancer-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>GarethHealy :: Camel Dynamic LoadBalancer</name>
 
     <scm>
