@@ -30,7 +30,7 @@ Provide the following strategies so that the load balancer can be adapted for di
 
 # Build and Install
 - mvn clean install
-- features:addurl mvn:com.garethahealy.camel/dynamic-lb-features/1.0.0/xml/features
+- features:addurl mvn:com.garethahealy.camel-dynamic-loadbalancer/dynamic-lb-features/1.0.0/xml/features
 - features:install com.garethahealy.camel-dynamic-lb-core
 
 And then either of the below:
