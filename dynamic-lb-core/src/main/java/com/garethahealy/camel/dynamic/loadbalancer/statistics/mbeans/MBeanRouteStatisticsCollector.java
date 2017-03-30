@@ -2,7 +2,7 @@
  * #%L
  * GarethHealy :: Camel Dynamic LoadBalance :: Core
  * %%
- * Copyright (C) 2013 - 2016 Gareth Healy
+ * Copyright (C) 2013 - 2017 Gareth Healy
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ public class MBeanRouteStatisticsCollector extends BaseMBeanAttributeCollector {
     }
 
     /**
-     * Get the route info which is matched against the processor info. i.e.: Processor URI -> Route FROM URI
+     * Get the route info which is matched against the processor info. i.e.: Processor URI - Route FROM URI
      *
      * @param processorHolders
      * @return
