@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)]()
 
 # PLEASE READ
-As this was a PoC and was never fully completed/contributed back to the Apache Camel project, this repo should be regarded as dead
+As this was a PoC and was never fully completed/contributed back to the Apache Camel project, this repo should be regarded as dead.
 
 # camel-dynamic-loadbalancer
 Sample code which implements a dynamic load balancer within camel
