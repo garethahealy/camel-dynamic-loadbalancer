@@ -2,6 +2,9 @@
 [![Release Version](https://img.shields.io/maven-central/v/com.garethahealy.camel-dynamic-loadbalancer/camel-dynamic-loadbalancer-parent.svg?maxAge=2592000)](https://mvnrepository.com/artifact/com.garethahealy.camel/camel-dynamic-loadbalancer-parent)
 [![License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)]()
 
+# PLEASE READ
+As this was a PoC and was never fully completed/contributed back to the Apache Camel project, this repo should be regarded as dead
+
 # camel-dynamic-loadbalancer
 Sample code which implements a dynamic load balancer within camel
 
